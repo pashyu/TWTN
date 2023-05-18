@@ -1,0 +1,4 @@
+jump_limit = 500
+window = 1
+destination = 105
+maxnode = 10000

@@ -1,0 +1,106 @@
+15:03:55.88 | 162596 | INFO | Loaded a network with 10000 nodes and 1998600 edges
+15:03:55.89 | 162596 | INFO | ==[ Fitness evaluation ]==
+15:03:55.89 | 162596 | INFO | Ship  1 | path length: 343
+15:03:55.89 | 162596 | INFO | Ship  2 | path length: 203
+15:03:55.89 | 162596 | INFO | Ship  3 | path length:  69
+15:03:55.89 | 162596 | INFO | Ship  4 | path length:   3
+15:03:55.89 | 162596 | INFO | Ship  5 | path length:   5
+15:03:55.89 | 162596 | INFO | Ship  6 | path length:   3
+15:03:55.89 | 162596 | INFO | Ship  7 | path length:   2
+15:03:55.89 | 162596 | INFO | Ship  8 | path length:   2
+15:03:55.89 | 162596 | INFO | Ship  9 | path length:   3
+15:03:55.89 | 162596 | INFO | Ship 10 | path length:  94
+15:03:55.89 | 162596 | INFO | Ship 11 | path length: 218
+15:03:55.89 | 162596 | INFO | Ship 12 | path length: 331
+15:03:55.89 | 162596 | INFO | Ship  1 origin constraint: satisfied
+15:03:55.90 | 162596 | INFO | Ship  2 origin constraint: satisfied
+15:03:55.90 | 162596 | INFO | Ship  3 origin constraint: satisfied
+15:03:55.90 | 162596 | INFO | Ship  4 origin constraint: satisfied
+15:03:55.90 | 162596 | INFO | Ship  5 origin constraint: satisfied
+15:03:55.90 | 162596 | INFO | Ship  6 origin constraint: satisfied
+15:03:55.90 | 162596 | INFO | Ship  7 origin constraint: satisfied
+15:03:55.90 | 162596 | INFO | Ship  8 origin constraint: satisfied
+15:03:55.90 | 162596 | INFO | Ship  9 origin constraint: satisfied
+15:03:55.90 | 162596 | INFO | Ship 10 origin constraint: satisfied
+15:03:55.90 | 162596 | INFO | Ship 11 origin constraint: satisfied
+15:03:55.90 | 162596 | INFO | Ship 12 origin constraint: satisfied
+15:03:55.91 | 162596 | INFO | Ship  1 path constraint: satisfied
+15:03:55.91 | 162596 | INFO | Ship  2 path constraint: satisfied
+15:03:55.91 | 162596 | INFO | Ship  3 path constraint: satisfied
+15:03:55.91 | 162596 | INFO | Ship  4 path constraint: satisfied
+15:03:55.91 | 162596 | INFO | Ship  5 path constraint: satisfied
+15:03:55.91 | 162596 | INFO | Ship  6 path constraint: satisfied
+15:03:55.91 | 162596 | INFO | Ship  7 path constraint: satisfied
+15:03:55.91 | 162596 | INFO | Ship  8 path constraint: satisfied
+15:03:55.91 | 162596 | INFO | Ship  9 path constraint: satisfied
+15:03:55.91 | 162596 | INFO | Ship 10 path constraint: satisfied
+15:03:55.91 | 162596 | INFO | Ship 11 path constraint: satisfied
+15:03:55.91 | 162596 | INFO | Ship 12 path constraint: satisfied
+15:03:55.94 | 162596 | INFO | Gap for ships  1 and  2: 0.00021869 (inside the window)
+15:03:55.94 | 162596 | INFO | Gap for ships  1 and  3: 0.00013986 (inside the window)
+15:03:55.94 | 162596 | INFO | Gap for ships  1 and  4: 0.08533910 (inside the window)
+15:03:55.94 | 162596 | INFO | Gap for ships  1 and  5: 0.21328393 (inside the window)
+15:03:55.94 | 162596 | INFO | Gap for ships  1 and  6: 0.40133214 (inside the window)
+15:03:55.94 | 162596 | INFO | Gap for ships  1 and  7: 0.61024910 (inside the window)
+15:03:55.94 | 162596 | INFO | Gap for ships  1 and  8: 0.72882718 (inside the window)
+15:03:55.94 | 162596 | INFO | Gap for ships  1 and  9: 0.98092848 (inside the window)
+15:03:55.94 | 162596 | INFO | Gap for ships  1 and 10: 0.99952507 (inside the window)
+15:03:55.94 | 162596 | INFO | Gap for ships  1 and 11: 0.99967802 (inside the window)
+15:03:55.94 | 162596 | INFO | Gap for ships  1 and 12: 0.99928474 (inside the window)
+15:03:55.94 | 162596 | INFO | Gap for ships  2 and  3: 0.00007883 (inside the window)
+15:03:55.95 | 162596 | INFO | Gap for ships  2 and  4: 0.08555779 (inside the window)
+15:03:55.95 | 162596 | INFO | Gap for ships  2 and  5: 0.21350262 (inside the window)
+15:03:55.95 | 162596 | INFO | Gap for ships  2 and  6: 0.40155083 (inside the window)
+15:03:55.95 | 162596 | INFO | Gap for ships  2 and  7: 0.61046779 (inside the window)
+15:03:55.95 | 162596 | INFO | Gap for ships  2 and  8: 0.72904587 (inside the window)
+15:03:55.95 | 162596 | INFO | Gap for ships  2 and  9: 0.98114717 (inside the window)
+15:03:55.95 | 162596 | INFO | Gap for ships  2 and 10: 0.99974376 (inside the window)
+15:03:55.95 | 162596 | INFO | Gap for ships  2 and 11: 0.99989665 (inside the window)
+15:03:55.95 | 162596 | INFO | Gap for ships  2 and 12: 0.99950349 (inside the window)
+15:03:55.95 | 162596 | INFO | Gap for ships  3 and  4: 0.08547896 (inside the window)
+15:03:55.95 | 162596 | INFO | Gap for ships  3 and  5: 0.21342379 (inside the window)
+15:03:55.95 | 162596 | INFO | Gap for ships  3 and  6: 0.40147203 (inside the window)
+15:03:55.95 | 162596 | INFO | Gap for ships  3 and  7: 0.61038899 (inside the window)
+15:03:55.95 | 162596 | INFO | Gap for ships  3 and  8: 0.72896707 (inside the window)
+15:03:55.95 | 162596 | INFO | Gap for ships  3 and  9: 0.98106837 (inside the window)
+15:03:55.95 | 162596 | INFO | Gap for ships  3 and 10: 0.99966490 (inside the window)
+15:03:55.95 | 162596 | INFO | Gap for ships  3 and 11: 0.99981785 (inside the window)
+15:03:55.95 | 162596 | INFO | Gap for ships  3 and 12: 0.99942464 (inside the window)
+15:03:55.95 | 162596 | INFO | Gap for ships  4 and  5: 0.12794483 (inside the window)
+15:03:55.95 | 162596 | INFO | Gap for ships  4 and  6: 0.31599307 (inside the window)
+15:03:55.95 | 162596 | INFO | Gap for ships  4 and  7: 0.52491003 (inside the window)
+15:03:55.95 | 162596 | INFO | Gap for ships  4 and  8: 0.64348811 (inside the window)
+15:03:55.95 | 162596 | INFO | Gap for ships  4 and  9: 0.89558935 (inside the window)
+15:03:55.95 | 162596 | INFO | Gap for ships  4 and 10: 0.91418600 (inside the window)
+15:03:55.95 | 162596 | INFO | Gap for ships  4 and 11: 0.91433889 (inside the window)
+15:03:55.95 | 162596 | INFO | Gap for ships  4 and 12: 0.91394567 (inside the window)
+15:03:55.95 | 162596 | INFO | Gap for ships  5 and  6: 0.18804823 (inside the window)
+15:03:55.95 | 162596 | INFO | Gap for ships  5 and  7: 0.39696521 (inside the window)
+15:03:55.95 | 162596 | INFO | Gap for ships  5 and  8: 0.51554328 (inside the window)
+15:03:55.95 | 162596 | INFO | Gap for ships  5 and  9: 0.76764452 (inside the window)
+15:03:55.95 | 162596 | INFO | Gap for ships  5 and 10: 0.78624117 (inside the window)
+15:03:55.96 | 162596 | INFO | Gap for ships  5 and 11: 0.78639406 (inside the window)
+15:03:55.96 | 162596 | INFO | Gap for ships  5 and 12: 0.78600085 (inside the window)
+15:03:55.96 | 162596 | INFO | Gap for ships  6 and  7: 0.20891696 (inside the window)
+15:03:55.96 | 162596 | INFO | Gap for ships  6 and  8: 0.32749504 (inside the window)
+15:03:55.96 | 162596 | INFO | Gap for ships  6 and  9: 0.57959634 (inside the window)
+15:03:55.96 | 162596 | INFO | Gap for ships  6 and 10: 0.59819293 (inside the window)
+15:03:55.96 | 162596 | INFO | Gap for ships  6 and 11: 0.59834582 (inside the window)
+15:03:55.96 | 162596 | INFO | Gap for ships  6 and 12: 0.59795260 (inside the window)
+15:03:55.96 | 162596 | INFO | Gap for ships  7 and  8: 0.11857807 (inside the window)
+15:03:55.96 | 162596 | INFO | Gap for ships  7 and  9: 0.37067935 (inside the window)
+15:03:55.96 | 162596 | INFO | Gap for ships  7 and 10: 0.38927594 (inside the window)
+15:03:55.96 | 162596 | INFO | Gap for ships  7 and 11: 0.38942885 (inside the window)
+15:03:55.96 | 162596 | INFO | Gap for ships  7 and 12: 0.38903564 (inside the window)
+15:03:55.96 | 162596 | INFO | Gap for ships  8 and  9: 0.25210130 (inside the window)
+15:03:55.96 | 162596 | INFO | Gap for ships  8 and 10: 0.27069789 (inside the window)
+15:03:55.96 | 162596 | INFO | Gap for ships  8 and 11: 0.27085078 (inside the window)
+15:03:55.96 | 162596 | INFO | Gap for ships  8 and 12: 0.27045757 (inside the window)
+15:03:55.96 | 162596 | INFO | Gap for ships  9 and 10: 0.01859659 (inside the window)
+15:03:55.96 | 162596 | INFO | Gap for ships  9 and 11: 0.01874951 (inside the window)
+15:03:55.96 | 162596 | INFO | Gap for ships  9 and 12: 0.01835629 (inside the window)
+15:03:55.96 | 162596 | INFO | Gap for ships 10 and 11: 0.00015292 (inside the window)
+15:03:55.96 | 162596 | INFO | Gap for ships 10 and 12: 0.00024030 (inside the window)
+15:03:55.96 | 162596 | INFO | Gap for ships 11 and 12: 0.00039321 (inside the window)
+15:03:56.00 | 162596 | INFO | Fitness | 431.01929
+15:03:56.00 | 162596 | INFO | The provided chromosome is a solution
