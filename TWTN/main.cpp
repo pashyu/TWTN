@@ -30,12 +30,13 @@ int main()
 	read_origin(origins);
 	read_ini_delays(ini_delays);
 	read_shortest(shortest_path, shortest_mean, shortest_var);
-	read_ini_solution(solution, visited, ini_delays, means);
+	//read_ini_solution(solution, visited, ini_delays, means);
+	read_0_11_path(solution, visited, ini_delays, means);
 	//check_domi(childs, means, vars, dominated);
-	deal_with_conflict(solution, visited, means, vars, ini_delays, shortest_mean, shortest_var, shortest_path, origins, childs);
+	//deal_with_conflict(solution, visited, means, vars, ini_delays, shortest_mean, shortest_var, shortest_path, origins, childs);
 	check_solution(solution, visited, means, vars, ini_delays);
-	write_solution(solution);
 	//write_solution(solution);
+	refinement(solution, childs, means, vars, ini_delays, 1, 1, 1);
 	//get_mean_andvar(childs, means, vars);
 	
 	return 0;

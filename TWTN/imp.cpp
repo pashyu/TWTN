@@ -9,7 +9,7 @@
 void read_edge_and_meanvar(vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<vector<int>>& neighbors)
 {
 	ld mean, var;
-	ifstream infile_meanvar("./data/meanvar.txt"), infile_edge("./data/edges.txt");
+	ifstream infile_meanvar("../data/meanvar.txt"), infile_edge("../data/edges.txt");
 	string linestr_meanvar, linestr_edge;
 	int cnt = 0;
 	while (infile_meanvar.good())
@@ -37,7 +37,7 @@ void read_edge_and_meanvar(vector<vector<ld>>& means, vector<vector<ld>>& vars, 
 
 void read_origin(vector<vector<int>>& origins)
 {
-	ifstream infile("./data/origins.txt");
+	ifstream infile("../data/origins.txt");
 	string linestr;
 	//每个飞船有14个候选起点
 	for (int i = 0; i < 12; ++i)
@@ -60,7 +60,7 @@ void read_origin(vector<vector<int>>& origins)
 
 void read_edge(vector<vector<int>>& neighbors)
 {
-	ifstream infile("./data/edges.txt");
+	ifstream infile("../data/edges.txt");
 
 	string linestr;
 	while (infile.good())
@@ -79,7 +79,7 @@ void read_edge(vector<vector<int>>& neighbors)
 
 void read_ini_delays(vector<ld>& ini_delays)
 {
-	ifstream infile("./data/delays.txt");
+	ifstream infile("../data/delays.txt");
 
 	for (int i = 0; i < 12; ++i)
 	{
@@ -96,7 +96,7 @@ void read_ini_delays(vector<ld>& ini_delays)
 
 void read_shortest(vector<vector<int>>& shortest_path, vector<ld>& shortest_mean, vector<ld>& shortest_var)
 {
-	ifstream infile("./data/shortest_path.txt");
+	ifstream infile("../data/shortest_path.txt");
 	string linestr;
 	for (int node = 1; node <= 10000; ++node)
 	{
@@ -220,7 +220,7 @@ bool is_in_time_window(ld time)
 
 void read_ini_solution(vector<vector<int>>& solution, vector<vector<ld>>& visited, vector<ld>& ini_delays, vector<vector<ld>>& means)
 {
-	ifstream infile("./data/best-ini.txt");
+	ifstream infile("../data/best-ini.txt");
 	for (int i = 0; i < 12; ++i)
 	{
 		int node = 0;
@@ -242,6 +242,33 @@ void read_ini_solution(vector<vector<int>>& solution, vector<vector<ld>>& visite
 				visited[node].emplace_back(delay);
 				solution[i].emplace_back(node);
 			}
+			prenode = node;
+		}
+	}
+	infile.close();
+}
+
+void read_0_11_path(vector<vector<int>>& solution, vector<vector<ld>>& visited, vector<ld>& ini_delays, vector<vector<ld>>& means)
+{
+	ifstream infile("../data/ship-0-11.txt");
+	for (int i = 0; i < 12; i+=11)
+	{
+		int node = 0;
+		ld delay = ini_delays[i];
+		infile >> node;
+
+		visited[node].emplace_back(delay);
+		solution[i].emplace_back(node);
+		
+		int prenode = node;
+		while (node != 105)
+		{
+			infile >> node;
+
+			delay += means[prenode][node];
+			visited[node].emplace_back(delay);
+			solution[i].emplace_back(node);
+			
 			prenode = node;
 		}
 	}
@@ -705,7 +732,7 @@ void check_solution(vector<vector<int>>& solution, vector<vector<ld>>& visited, 
 
 void write_solution(vector<vector<int>>& solution)
 {
-	ofstream outfile("./data/ship-0-11.txt");
+	ofstream outfile("../data/ship-0-11.txt");
 	for (int ship = 0; ship < 12; ship+=11)
 	{
 		vector<int>& route = solution[ship];
@@ -1399,12 +1426,89 @@ void dfs_partial(int ship, int destination, vector<vector<int>>& childs, vector<
 	return;
 }
 
-void refinement()
+void refinement(vector<vector<int>>& solution, vector<vector<int>>& childs, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<ld>& ini_delays, ld max_var, ld left_time, ld right_time)
 {
 	//处理完冲突，ship0和11的路线超过了时间窗约束，在这里完善，让0和11多绕一些路
+	//两条路的var都不超过max_var, 时间落在left_time和right_time里
 	vector<int> ship_0_path = solution[0], ship_11_path = solution[11];
 
+	int search_depth = 2;
+
+	ld ship_0_mean = 0, ship_0_var = 0, ship_11_mean = 0, ship_11_var = 0;
+
+
+	//统计一遍旧的
+	ship_0_mean = ini_delays[0];
+	for (int i = 1; i < ship_0_path.size(); ++i)
+	{
+		int node = ship_0_path[i], prenode = ship_0_path[i - 1];
+		ship_0_mean += means[prenode][node];
+		ship_0_var += vars[prenode][node];
+	}
+
+	ship_11_mean = ini_delays[1];
+	for (int i = 1; i < ship_11_path.size(); ++i)
+	{
+		int node = ship_11_path[i], prenode = ship_11_path[i - 1];
+		ship_11_mean += means[prenode][node];
+		ship_11_var += vars[prenode][node];
+	}
+
+	//每一轮只挑一处做改动，如果不能改到时间窗里，就选一个靠近时间窗的，var增加最小的
+
 	//先处理ship 0
-	
+	while (ship_0_mean < left_time)
+	{
+		int insert_pos = -1;
+		vector<int> new_path;
+		ld path_var = 0;
+
+
+		//修改后能否满足时间窗
+		bool feasible = false;
+
+		ld var_increase = 1;
+		ld mean_change = 0;
+
+
+		for (int i = 1; ship_0_path[i] != 105; ++i)
+		{
+			int prenode = ship_0_path[i - 1], node = ship_0_path[i];
+
+			ld old_mean = means[prenode][node];
+
+			vector<int> path;
+			ld best_var = 1, path_mean = 0;
+			path.emplace_back(prenode);
+			//做一个dfs，到达node时的深度不能为1，不超过search_depth,选择一个mean符合ship要求的，var最小的
+
+
+
+			//检查是否替换new_path
+
+
+		}
+
+		//new_path有没有内容
+		if (insert_pos > 0)
+		{
+			
+		}
+		else
+		{
+			//找不到路了
+			
+			break;
+		}
+
+
+
+	}
+
+	//处理ship11
+	while (ship_11_mean > right_time)
+	{
+		
+	}
 
 }
