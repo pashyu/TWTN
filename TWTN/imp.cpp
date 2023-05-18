@@ -1399,3 +1399,12 @@ void dfs_partial(int ship, int destination, vector<vector<int>>& childs, vector<
 	return;
 }
 
+void refinement()
+{
+	//处理完冲突，ship0和11的路线超过了时间窗约束，在这里完善，让0和11多绕一些路
+	vector<int> ship_0_path = solution[0], ship_11_path = solution[11];
+
+	//先处理ship 0
+	
+
+}
