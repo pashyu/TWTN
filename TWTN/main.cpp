@@ -36,7 +36,9 @@ int main()
 	//deal_with_conflict(solution, visited, means, vars, ini_delays, shortest_mean, shortest_var, shortest_path, origins, childs);
 	check_solution(solution, visited, means, vars, ini_delays);
 	//write_solution(solution);
-	refinement(solution, childs, means, vars, ini_delays, 1, 1, 1);
+	refinement(solution, childs, means, vars, ini_delays, 0.0296, -0.507, 0.493);
+
+	check_solution(solution, visited, means, vars, ini_delays);
 	//get_mean_andvar(childs, means, vars);
 	
 	return 0;

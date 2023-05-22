@@ -8,10 +8,9 @@ E:\TWTN\TWTN\imp.cpp(106,33): warning C4267: “=”: 从“size_t”转换到�
 E:\TWTN\TWTN\imp.cpp(487,34): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
 E:\TWTN\TWTN\imp.cpp(1143,134): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
 E:\TWTN\TWTN\imp.cpp(1187,140): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-  main.cpp
   正在生成代码
-  36 of 521 functions ( 6.9%) were compiled, the rest were copied from previous compilation.
-    1 functions were new in current compilation
-    15 functions had inline decision re-evaluated but remain unchanged
+  2 of 580 functions ( 0.3%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    2 functions had inline decision re-evaluated but remain unchanged
   已完成代码的生成
   TWTN.vcxproj -> E:\TWTN\x64\Release\TWTN.exe

@@ -1432,7 +1432,7 @@ void refinement(vector<vector<int>>& solution, vector<vector<int>>& childs, vect
 	//两条路的var都不超过max_var, 时间落在left_time和right_time里
 	vector<int> ship_0_path = solution[0], ship_11_path = solution[11];
 
-	int search_depth = 2;
+	int search_depth = 4;
 
 	ld ship_0_mean = 0, ship_0_var = 0, ship_11_mean = 0, ship_11_var = 0;
 
@@ -1446,7 +1446,7 @@ void refinement(vector<vector<int>>& solution, vector<vector<int>>& childs, vect
 		ship_0_var += vars[prenode][node];
 	}
 
-	ship_11_mean = ini_delays[1];
+	ship_11_mean = ini_delays[11];
 	for (int i = 1; i < ship_11_path.size(); ++i)
 	{
 		int node = ship_11_path[i], prenode = ship_11_path[i - 1];
@@ -1470,7 +1470,7 @@ void refinement(vector<vector<int>>& solution, vector<vector<int>>& childs, vect
 		ld var_increase = 1;
 		ld mean_change = 0;
 
-
+		break;
 		for (int i = 1; ship_0_path[i] != 105; ++i)
 		{
 			int prenode = ship_0_path[i - 1], node = ship_0_path[i];
@@ -1478,37 +1478,272 @@ void refinement(vector<vector<int>>& solution, vector<vector<int>>& childs, vect
 			ld old_mean = means[prenode][node];
 
 			vector<int> path;
-			ld best_var = 1, path_mean = 0;
+			ld best_var = 0.01, best_path_mean = 0;
+			vector<int> best_path;
 			path.emplace_back(prenode);
 			//做一个dfs，到达node时的深度不能为1，不超过search_depth,选择一个mean符合ship要求的，var最小的
+			dfs_refine(0, node, childs, ship_0_path, ship_11_path, old_mean, means, vars, path, 0, prenode, 0, best_path, best_var, best_path_mean, search_depth);
 
 
+			if (best_path.size() == 0)
+				continue;
 
 			//检查是否替换new_path
+			if (feasible)
+			{
+				if (ship_0_mean - old_mean + best_path_mean > left_time)
+				{
+					//best_path也feasible
+					ld old_var = vars[prenode][node];
+					if (best_var - old_var < var_increase)
+					{
+						new_path = best_path;
+						var_increase = best_var - old_var;
+						mean_change = best_path_mean - old_mean;
+						insert_pos = i - 1;
+					}
+				}
+			}
+			else
+			{
+				if (ship_0_mean - old_mean + best_path_mean > left_time)
+				{
+					//best_path  feasible
+					ld old_var = vars[prenode][node];
 
+					feasible = true;
+					new_path = best_path;
+					var_increase = best_var - old_var;
+					mean_change = best_path_mean - old_mean;
+					insert_pos = i - 1;
 
+				}
+				else
+				{
+					ld old_var = vars[prenode][node];
+
+					if (best_var - old_var < var_increase)
+					{
+						new_path = best_path;
+						var_increase = best_var - old_var;
+						mean_change = best_path_mean - old_mean;
+						insert_pos = i - 1;
+					}
+				}
+			}
+			if (insert_pos >= 0)
+				break;
 		}
 
 		//new_path有没有内容
-		if (insert_pos > 0)
+		if (insert_pos >= 0)
 		{
-			
+			int prenode = ship_0_path[insert_pos], node = ship_0_path[insert_pos + 1];
+			ld old_mean = means[prenode][node], old_var = vars[prenode][node];
+
+			if (ship_0_var + var_increase > max_var)
+				break;
+			/*ld test = 0;
+			for (int i = 1; i < new_path.size(); ++i)
+			{
+				test += means[new_path[i - 1]][new_path[i]];
+			}
+			cout << "mean change : " << mean_change << "  check val:  " << test - old_mean << endl;
+			test = 0;
+			for (int i = 1; i < new_path.size(); ++i)
+			{
+				test += vars[new_path[i - 1]][new_path[i]];
+			}
+			cout << "var change : " << var_increase << "  check val:  " << test - old_var << endl;*/
+			for (int i = 1; new_path[i] != node; ++i)
+			{
+				ship_0_path.insert(ship_0_path.begin() + insert_pos + i, new_path[i]);
+			}
+
+			ship_0_mean += mean_change;
+			ship_0_var += var_increase;
+			cout << "ship 0 mean: " << ship_0_mean << "  var : " << ship_0_var << endl;
 		}
 		else
 		{
 			//找不到路了
-			
+			break;
+		}
+
+		
+
+	}
+	solution[0] = ship_0_path;
+	//处理ship11
+
+	while (ship_11_mean > right_time)
+	{
+		int insert_pos = -1;
+		vector<int> new_path;
+		ld path_var = 0;
+
+
+		//修改后能否满足时间窗
+		bool feasible = false;
+
+		ld var_increase = 1;
+		ld mean_change = 0;
+
+
+		for (int i = 1; ship_11_path[i] != 105; ++i)
+		{
+			int prenode = ship_11_path[i - 1], node = ship_11_path[i];
+
+			ld old_mean = means[prenode][node];
+
+			vector<int> path;
+			ld best_var = 0.01, best_path_mean = 0;
+			vector<int> best_path;
+			path.emplace_back(prenode);
+			//做一个dfs，到达node时的深度不能为1，不超过search_depth,选择一个mean符合ship要求的，var最小的
+			dfs_refine(11, node, childs, ship_0_path, ship_11_path, old_mean, means, vars, path, 0, prenode, 0, best_path, best_var, best_path_mean, search_depth);
+
+
+			if (best_path.size() == 0)
+				continue;
+
+			//检查是否替换new_path
+			if (feasible)
+			{
+				if (ship_11_mean - old_mean + best_path_mean < right_time)
+				{
+					//best_path也feasible
+					ld old_var = vars[prenode][node];
+					if (best_var - old_var < var_increase)
+					{
+						new_path = best_path;
+						var_increase = best_var - old_var;
+						mean_change = best_path_mean - old_mean;
+						insert_pos = i - 1;
+					}
+				}
+			}
+			else
+			{
+				if (ship_11_mean - old_mean + best_path_mean < right_time)
+				{
+					//best_path  feasible
+					ld old_var = vars[prenode][node];
+
+					feasible = true;
+					new_path = best_path;
+					var_increase = best_var - old_var;
+					mean_change = best_path_mean - old_mean;
+					insert_pos = i - 1;
+
+				}
+				else
+				{
+					ld old_var = vars[prenode][node];
+
+					if (best_var - old_var < var_increase)
+					{
+						new_path = best_path;
+						var_increase = best_var - old_var;
+						mean_change = best_path_mean - old_mean;
+						insert_pos = i - 1;
+					}
+				}
+			}
+			if (insert_pos >= 0)
+				break;
+		}
+
+		//new_path有没有内容
+		if (insert_pos >= 0)
+		{
+			int prenode = ship_11_path[insert_pos], node = ship_11_path[insert_pos + 1];
+			ld old_mean = means[prenode][node], old_var = vars[prenode][node];
+
+			if (ship_11_var + var_increase > max_var)
+				break;
+			/*ld test = 0;
+			for (int i = 1; i < new_path.size(); ++i)
+			{
+				test += means[new_path[i - 1]][new_path[i]];
+			}
+			cout << "mean change : " << mean_change << "  check val:  " << test - old_mean << endl;
+			test = 0;
+			for (int i = 1; i < new_path.size(); ++i)
+			{
+				test += vars[new_path[i - 1]][new_path[i]];
+			}
+			cout << "var change : " << var_increase << "  check val:  " << test - old_var << endl;*/
+			for (int i = 1; new_path[i] != node; ++i)
+			{
+				ship_11_path.insert(ship_11_path.begin() + insert_pos + i, new_path[i]);
+			}
+
+			ship_11_mean += mean_change;
+			ship_11_var += var_increase;
+
+			cout << "ship 11 mean: " << ship_11_mean << "  var : " << ship_11_var << endl;
+		}
+		else
+		{
+			//找不到路了
 			break;
 		}
 
 
-
 	}
+	solution[11] = ship_11_path;
+}
 
-	//处理ship11
-	while (ship_11_mean > right_time)
+void dfs_refine(int ship, int destination, vector<vector<int>>& childs, vector<int>& ship_0_path, vector<int>& ship_11_path, ld old_mean, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<int>& path, ld current_delay, int node, ld current_var, vector<int>& best_path, ld& best_var, ld& best_path_mean, int search_depth)
+{
+	if (search_depth < 0)
+		return;
+
+	if (node == destination)
 	{
+		if (ship == 0 && current_delay > old_mean && path.size() > 2 || ship == 11 && current_delay < old_mean && path.size() > 2)
+		{
+			if (current_var < best_var)
+			{
+				best_path = path;
+				best_var = current_var;
+				best_path_mean = current_delay;
+				//cout << "found best " << best_var <<"  hops: "<<path.size() << endl;
+			}
+		}
 		
+		return;
 	}
+	if (current_var > best_var)
+	{
+		return;
+	}
+	
+	for (auto child : childs[node])
+	{
+		if (child != destination)
+		{
+			//检查重复 
+			bool repeat = false;
+			if (find(ship_0_path.begin(), ship_0_path.end(), child) != ship_0_path.end())
+				repeat = true;
+
+			if (find(ship_11_path.begin(), ship_11_path.end(), child) != ship_11_path.end())
+				repeat = true;
+
+			if (find(path.begin(), path.end(), child) != path.end())
+				repeat = true;
+
+			if (repeat)
+				continue;
+		}
+		
+		path.emplace_back(child);
+		dfs_refine(ship, destination, childs, ship_0_path, ship_11_path, old_mean, means, vars, path, current_delay + means[node][child], child, current_var + vars[node][child], best_path, best_var, best_path_mean, search_depth - 1);
+		path.erase(path.end() - 1);
+
+	}
+	return;
 
 }
