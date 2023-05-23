@@ -1,5 +1,6 @@
 #pragma once
 #include<vector>
+#include<string>
 using ld = long double;
 extern int des;
 extern int jump_limit;
@@ -27,7 +28,7 @@ bool is_in_time_window(ld time);
 
 void read_ini_solution(vector<vector<int>>& solution, vector<vector<ld>>& visited, vector<ld>& ini_delays, vector<vector<ld>>& means);
 
-void read_0_11_path(vector<vector<int>>& solution, vector<vector<ld>>& visited, vector<ld>& ini_delays, vector<vector<ld>>& means);
+void read_0_11_path(vector<vector<int>>& solution, vector<vector<ld>>& visited, vector<ld>& ini_delays, vector<vector<ld>>& means, string filename);
 
 void get_mean_andvar(vector<vector<int>>& childs, vector<vector<ld>>& means, vector<vector<ld>>& vars);
 
@@ -39,7 +40,7 @@ void gene_solution(int ship, vector<vector<int>>& childs, vector<vector<int>>& s
 
 void check_solution(vector<vector<int>>& solution, vector<vector<ld>>& visited, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<ld>& ini_delays);
 
-void write_solution(vector<vector<int>>& solution);
+void write_solution(vector<vector<int>>& solution, string filename);
 
 void delete_ship_path(int ship, vector<vector<int>>& solution, vector<vector<ld>>& visited, vector<vector<ld>>& means, vector<ld>& ini_delays);
 
@@ -60,3 +61,15 @@ void dfs_partial(int ship, int destination, vector<vector<int>>& childs, vector<
 void refinement(vector<vector<int>>& solution, vector<vector<int>>& childs, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<ld>& ini_delays, ld max_var, ld left_time, ld right_time);
 
 void dfs_refine(int ship, int destination, vector<vector<int>>& childs, vector<int>& ship_0_path, vector<int>& ship_11_path, ld old_mean, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<int>& path, ld current_delay, int node, ld current_var, vector<int>& best_path, ld& best_var, ld& best_path_mean, int search_depth);
+
+void transfer_file(string filename);
+
+void make_tree_var(vector<vector<int>>& childs, vector<ld>& result, vector<vector<ld>>& vars);
+
+void make_tree_posi(vector<vector<int>>& childs, vector<ld>& result, vector<vector<ld>>& means);
+
+void make_tree_nege(vector<vector<int>>& childs, vector<ld>& result, vector<vector<ld>>& means);
+
+void read_bound(string bound_path, vector<ld>& var_bound, vector<ld>& mean_posi_bound, vector<ld>& mean_nege_bound);
+
+void A_star_path_find(vector<vector<int>>)

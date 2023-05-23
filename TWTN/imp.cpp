@@ -220,37 +220,37 @@ bool is_in_time_window(ld time)
 
 void read_ini_solution(vector<vector<int>>& solution, vector<vector<ld>>& visited, vector<ld>& ini_delays, vector<vector<ld>>& means)
 {
-	ifstream infile("../data/best-ini.txt");
+	ifstream infile("../data/275.167.txt");
 	for (int i = 0; i < 12; ++i)
 	{
 		int node = 0;
 		ld delay = ini_delays[i];
 		infile >> node;
-		if (i == 0 || i == 11)
-		{
+		//if (i == 0 || i == 11)
+		//{
 			visited[node].emplace_back(delay);
 			solution[i].emplace_back(node);
-		}
+		//}
 		int prenode = node;
 		while (node != 105)
 		{
 			infile >> node;
 
 			delay += means[prenode][node];
-			if (i == 0 || i == 11)
-			{
+			//if (i == 0 || i == 11)
+			//{
 				visited[node].emplace_back(delay);
 				solution[i].emplace_back(node);
-			}
+			//}
 			prenode = node;
 		}
 	}
 	infile.close();
 }
 
-void read_0_11_path(vector<vector<int>>& solution, vector<vector<ld>>& visited, vector<ld>& ini_delays, vector<vector<ld>>& means)
+void read_0_11_path(vector<vector<int>>& solution, vector<vector<ld>>& visited, vector<ld>& ini_delays, vector<vector<ld>>& means, string filename)
 {
-	ifstream infile("../data/ship-0-11.txt");
+	ifstream infile(filename);
 	for (int i = 0; i < 12; i+=11)
 	{
 		int node = 0;
@@ -271,6 +271,7 @@ void read_0_11_path(vector<vector<int>>& solution, vector<vector<ld>>& visited, 
 			
 			prenode = node;
 		}
+		solution[i].emplace_back(105);
 	}
 	infile.close();
 }
@@ -706,7 +707,7 @@ void check_solution(vector<vector<int>>& solution, vector<vector<ld>>& visited, 
 			}
 			if (visited[node].size() == 1)
 				k = 0;
-			if (vars[node][route[j]] > 1e-4)
+			if (vars[node][route[j]] > 3e-4)
 				++cnt;
 			if (visited[node].size() > 1 && ship == 0)
 				++repeat_cnt;
@@ -730,9 +731,16 @@ void check_solution(vector<vector<int>>& solution, vector<vector<ld>>& visited, 
 }
 
 
-void write_solution(vector<vector<int>>& solution)
+void write_solution(vector<vector<int>>& solution, string filename)
 {
-	ofstream outfile("../data/ship-0-11.txt");
+	string filepath, name;
+
+	int path_pos = filename.find_last_of('\\');
+	filepath = filename.substr(0, path_pos + 1);
+	name = filename.substr(path_pos + 1);
+	filepath += "exceed-timewindow\\";
+	
+	ofstream outfile(filepath + name);
 	for (int ship = 0; ship < 12; ship+=11)
 	{
 		vector<int>& route = solution[ship];
@@ -1130,7 +1138,7 @@ void deal_with_conflict(vector<vector<int>>& solution, vector<vector<ld>>& visit
 
 	//两个ship的起点肯定不会重复
 	//search_width不能小于3，小于3就大于275.9了
-	int search_width = 6;
+	int search_width = 7;
 	for (int i = 0; solution[0][i] != 105; ++i)
 	{
 		if (visited[solution[0][i]].size() > 1)
@@ -1250,10 +1258,10 @@ void deal_with_conflict(vector<vector<int>>& solution, vector<vector<ld>>& visit
 			ship_0_path.emplace_back(ship_0_left_node);
 
 
-			cout << "start search ship0  old var: "<<ship_0_old_var <<"  " << ship_0_left_node << " to " << ship_0_right_node << endl;
+			//cout << "start search ship0  old var: "<<ship_0_old_var <<"  " << ship_0_left_node << " to " << ship_0_right_node << endl;
 			dfs_partial(0, ship_0_right_node, childs, partial_paths, solution[11], ship_0_old_mean, means, vars, ship_0_path, 0, ship_0_left_node, 0, ship_0_best_path, ship_0_best_var, shortest_var);
 
-			cout << ship_0_best_var << endl;
+			//cout << ship_0_best_var << endl;
 
 
 			//搜ship11
@@ -1269,11 +1277,11 @@ void deal_with_conflict(vector<vector<int>>& solution, vector<vector<ld>>& visit
 			ship_11_path.emplace_back(ship_11_left_node);
 
 
-			cout << "start search ship11  old var: " << ship_11_old_var << "  " << ship_11_left_node << " to " << ship_11_right_node << endl;
+			//cout << "start search ship11  old var: " << ship_11_old_var << "  " << ship_11_left_node << " to " << ship_11_right_node << endl;
 			//if(!(ship_11_right_node == 105 && abs(ship_11_old_var - shortest_var[ship_11_left_node]) < 1e-6))
 			dfs_partial(11, ship_11_right_node, childs, partial_paths, solution[0], ship_11_old_mean, means, vars, ship_11_path, 0, ship_11_left_node, 0, ship_11_best_path, ship_11_best_var, shortest_var);
 
-			cout << ship_11_best_var << endl;
+			//cout << ship_11_best_var << endl;
 
 
 			if (ship_0_best_path.size() == 0 && ship_11_best_path.size() == 0)
@@ -1417,6 +1425,9 @@ void dfs_partial(int ship, int destination, vector<vector<int>>& childs, vector<
 				continue;
 		}
 		if (destination ==105 && current_var + shortest_var[child] > best_var)
+			continue;
+
+		if (vars[node][child] > 3e-4)
 			continue;
 		path.emplace_back(child);
 		dfs_partial(ship, destination, childs, partial_paths, other_path, old_mean, means, vars, path, current_delay + means[node][child], child, current_var + vars[node][child], best_path, best_var, shortest_var);
@@ -1745,5 +1756,331 @@ void dfs_refine(int ship, int destination, vector<vector<int>>& childs, vector<i
 
 	}
 	return;
+
+}
+
+
+void transfer_file(string filename)
+{
+	ifstream infile(filename);
+
+
+
+
+	string linestr;
+	getline(infile, linestr);
+	getline(infile, linestr);
+
+	int pos1 = linestr.find_first_of('['), pos2 = linestr.find_last_of(']');
+
+	++pos1;
+	string filepath, name;
+	int pathpos = filename.find_last_of('\\');
+	filepath = filename.substr(0, pathpos + 1);
+	name = filename.substr(pathpos + 1);
+
+	filepath += "ini-solutions\\";
+
+	ofstream outfile(filepath + name);
+
+	while (pos1 < pos2)
+	{
+		int gam_pos = linestr.find(',', pos1);
+		int node = stoi(linestr.substr(pos1, gam_pos - pos1));
+
+		while (node != 0)
+		{
+			outfile << node << ' ';
+			pos1 = gam_pos + 1;
+			gam_pos = linestr.find(',', pos1);
+			node = stoi(linestr.substr(pos1, gam_pos - pos1));
+		}
+		outfile << 105 << endl;
+		while (node == 0)
+		{
+			pos1 = gam_pos + 1;
+			gam_pos = linestr.find(',', pos1);
+			node = stoi(linestr.substr(pos1, gam_pos - pos1));
+		}
+		while (node != 0)
+		{
+			outfile << node << ' ';
+			pos1 = gam_pos + 1;
+			gam_pos = linestr.find(',', pos1);
+			node = stoi(linestr.substr(pos1, gam_pos - pos1));
+		}
+		outfile << 105 << endl;
+		break;
+	}
+
+
+
+	infile.close();
+	outfile.close();
+}
+
+void make_tree_var(vector<vector<int>>& childs, vector<ld>& result, vector<vector<ld>>& vars)
+{
+	//加入到树里的点标20，本来不可达的标10
+	
+	//先记录一个reverse_childs
+	vector<vector<int>> reverse_childs(10001, vector<int>());
+
+	for (int node = 1; node <= 10000; ++node)
+	{
+		for (auto child : childs[node])
+		{
+			reverse_childs[child].emplace_back(node);
+		}
+	}
+
+
+
+	result.assign(501, 10);
+
+	vector<ld> distance(10001, 10);
+	
+
+
+
+	result[0] = 0;
+	distance[105] = 20;
+	for (auto t_node : reverse_childs[105])
+	{
+		distance[t_node] = vars[t_node][105];
+	}
+
+
+	int iter = 1;
+	while (iter <= 500)
+	{
+		ld edge_cost = 5;
+		int add_node = 0;
+
+		//选点
+		for (int node = 1; node <= 10000; ++node)
+		{
+			if (distance[node] < edge_cost)
+			{
+				add_node = node;
+				edge_cost = distance[node];
+			}
+		}
+
+		if (add_node == 0)
+		{
+			cout << "add node 0 error" << endl;
+			break;
+		}
+
+		result[iter] = result[iter - 1] + edge_cost;
+		distance[add_node] = 20;
+
+		for (auto node : reverse_childs[add_node])
+		{
+			if (distance[node] > 15)
+				continue;
+
+			distance[node] = min(distance[node], vars[node][add_node]);
+		}
+
+
+		++iter;
+
+	}
+
+	ofstream outfile("../data/tree_var.txt");
+	for (int i = 1; i <= 500; ++i)
+	{
+		outfile << i << " " << result[i] << endl;
+	}
+	outfile.close();
+}
+
+
+void make_tree_posi(vector<vector<int>>& childs, vector<ld>& result, vector<vector<ld>>& means)
+{
+	vector<vector<int>> reverse_childs(10001, vector<int>());
+
+	for (int node = 1; node <= 10000; ++node)
+	{
+		for (auto child : childs[node])
+		{
+			reverse_childs[child].emplace_back(node);
+		}
+	}
+
+
+
+	result.assign(501, 10);
+
+	vector<ld> distance(10001, -10);
+
+
+
+
+	result[0] = 0;
+	distance[105] = -20;
+	for (auto t_node : reverse_childs[105])
+	{
+		distance[t_node] = means[t_node][105];
+	}
+
+
+	int iter = 1;
+	while (iter <= 500)
+	{
+		ld edge_gain = -5;
+		int add_node = 0;
+
+		//选点
+		for (int node = 1; node <= 10000; ++node)
+		{
+			if (distance[node] > edge_gain)
+			{
+				add_node = node;
+				edge_gain = distance[node];
+			}
+		}
+
+		if (add_node == 0)
+		{
+			cout << "add node 0 error" << endl;
+			break;
+		}
+
+		result[iter] = result[iter - 1] + edge_gain;
+		distance[add_node] = -20;
+
+		for (auto node : reverse_childs[add_node])
+		{
+			if (distance[node] < -15)
+				continue;
+
+			distance[node] = max(distance[node], means[node][add_node]);
+		}
+
+
+		++iter;
+
+	}
+
+	ofstream outfile("../data/tree_posi.txt");
+	for (int i = 1; i <= 500; ++i)
+	{
+		outfile << i << " " << result[i] << endl;
+	}
+	outfile.close();
+}
+
+void make_tree_nege(vector<vector<int>>& childs, vector<ld>& result, vector<vector<ld>>& means)
+{
+	vector<vector<int>> reverse_childs(10001, vector<int>());
+
+	for (int node = 1; node <= 10000; ++node)
+	{
+		for (auto child : childs[node])
+		{
+			reverse_childs[child].emplace_back(node);
+		}
+	}
+
+
+
+	result.assign(501, 10);
+
+	vector<ld> distance(10001, 10);
+
+
+
+
+	result[0] = 0;
+	distance[105] = 20;
+	for (auto t_node : reverse_childs[105])
+	{
+		distance[t_node] = means[t_node][105];
+	}
+
+
+	int iter = 1;
+	while (iter <= 500)
+	{
+		ld edge_cost = 5;
+		int add_node = 0;
+
+		//选点
+		for (int node = 1; node <= 10000; ++node)
+		{
+			if (distance[node] < edge_cost)
+			{
+				add_node = node;
+				edge_cost = distance[node];
+			}
+		}
+
+		if (add_node == 0)
+		{
+			cout << "add node 0 error" << endl;
+			break;
+		}
+
+		result[iter] = result[iter - 1] + edge_cost;
+		distance[add_node] = 20;
+
+		for (auto node : reverse_childs[add_node])
+		{
+			if (distance[node] > 15)
+				continue;
+
+			distance[node] = min(distance[node], means[node][add_node]);
+		}
+
+
+		++iter;
+
+	}
+
+	ofstream outfile("../data/tree_nege.txt");
+	for (int i = 1; i <= 500; ++i)
+	{
+		outfile << i << " " << result[i] << endl;
+	}
+	outfile.close();
+}
+
+void read_bound(string bound_path, vector<ld>& var_bound, vector<ld>& mean_posi_bound, vector<ld>& mean_nege_bound)
+{
+	string filename = bound_path + "tree_var.txt";
+
+	ifstream infile(filename);
+
+	for (int i = 1; i <= 500; ++i)
+	{
+		int iter;
+		infile >> iter >> var_bound[i];
+	}
+
+	infile.close();
+
+
+	filename = bound_path + "tree_posi.txt";
+	infile.open(filename);
+
+	for (int i = 1; i <= 500; ++i)
+	{
+		int iter;
+		infile >> iter >> mean_posi_bound[i];
+	}
+	infile.close();
+
+	filename = bound_path + "tree_nege.txt";
+	infile.open(filename);
+
+	for (int i = 1; i <= 500; ++i)
+	{
+		int iter;
+		infile >> iter >> mean_nege_bound[i];
+	}
+	infile.close();
 
 }
