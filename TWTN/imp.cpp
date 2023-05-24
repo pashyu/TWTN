@@ -1819,7 +1819,7 @@ void transfer_file(string filename)
 	outfile.close();
 }
 
-void make_tree_var(vector<vector<int>>& childs, vector<ld>& result, vector<vector<ld>>& vars)
+void make_tree_var(vector<vector<int>>& childs, vector<ld>& result, vector<vector<ld>>& vars, vector<bool>& is_in_tree, vector<int>& path)
 {
 	//加入到树里的点标20，本来不可达的标10
 	
@@ -1860,6 +1860,11 @@ void make_tree_var(vector<vector<int>>& childs, vector<ld>& result, vector<vecto
 		//选点
 		for (int node = 1; node <= 10000; ++node)
 		{
+			if (find(path.begin(), path.end(), node) != path.end())
+			{
+				distance[node] = 20;
+				continue;
+			}
 			if (distance[node] < edge_cost)
 			{
 				add_node = node;
@@ -1875,6 +1880,7 @@ void make_tree_var(vector<vector<int>>& childs, vector<ld>& result, vector<vecto
 
 		result[iter] = result[iter - 1] + edge_cost;
 		distance[add_node] = 20;
+		is_in_tree[add_node] = true;
 
 		for (auto node : reverse_childs[add_node])
 		{
@@ -1889,16 +1895,15 @@ void make_tree_var(vector<vector<int>>& childs, vector<ld>& result, vector<vecto
 
 	}
 
-	ofstream outfile("../data/tree_var.txt");
+	/*ofstream outfile("../data/tree_var.txt");
 	for (int i = 1; i <= 500; ++i)
 	{
 		outfile << i << " " << result[i] << endl;
 	}
-	outfile.close();
+	outfile.close();*/
 }
 
-
-void make_tree_posi(vector<vector<int>>& childs, vector<ld>& result, vector<vector<ld>>& means)
+void make_tree_posi(vector<vector<int>>& childs, vector<ld>& result, vector<vector<ld>>& means, vector<bool>& is_in_tree, vector<bool>& is_in_tree, vector<int>& path)
 {
 	vector<vector<int>> reverse_childs(10001, vector<int>());
 
@@ -1936,6 +1941,11 @@ void make_tree_posi(vector<vector<int>>& childs, vector<ld>& result, vector<vect
 		//选点
 		for (int node = 1; node <= 10000; ++node)
 		{
+			if (find(path.begin(), path.end(), node) != path.end())
+			{
+				distance[node] = -20;
+				continue;
+			}
 			if (distance[node] > edge_gain)
 			{
 				add_node = node;
@@ -1951,6 +1961,7 @@ void make_tree_posi(vector<vector<int>>& childs, vector<ld>& result, vector<vect
 
 		result[iter] = result[iter - 1] + edge_gain;
 		distance[add_node] = -20;
+		is_in_tree[add_node] = true;
 
 		for (auto node : reverse_childs[add_node])
 		{
@@ -1965,15 +1976,15 @@ void make_tree_posi(vector<vector<int>>& childs, vector<ld>& result, vector<vect
 
 	}
 
-	ofstream outfile("../data/tree_posi.txt");
+	/*ofstream outfile("../data/tree_posi.txt");
 	for (int i = 1; i <= 500; ++i)
 	{
 		outfile << i << " " << result[i] << endl;
 	}
-	outfile.close();
+	outfile.close();*/
 }
 
-void make_tree_nege(vector<vector<int>>& childs, vector<ld>& result, vector<vector<ld>>& means)
+void make_tree_nege(vector<vector<int>>& childs, vector<ld>& result, vector<vector<ld>>& means, vector<bool>& is_in_tree, vector<bool>& is_in_tree, vector<int>& path)
 {
 	vector<vector<int>> reverse_childs(10001, vector<int>());
 
@@ -2011,6 +2022,11 @@ void make_tree_nege(vector<vector<int>>& childs, vector<ld>& result, vector<vect
 		//选点
 		for (int node = 1; node <= 10000; ++node)
 		{
+			if (find(path.begin(), path.end(), node) != path.end())
+			{
+				distance[node] = 20;
+				continue;
+			}
 			if (distance[node] < edge_cost)
 			{
 				add_node = node;
@@ -2026,6 +2042,7 @@ void make_tree_nege(vector<vector<int>>& childs, vector<ld>& result, vector<vect
 
 		result[iter] = result[iter - 1] + edge_cost;
 		distance[add_node] = 20;
+		is_in_tree[add_node] = true;
 
 		for (auto node : reverse_childs[add_node])
 		{
@@ -2040,12 +2057,12 @@ void make_tree_nege(vector<vector<int>>& childs, vector<ld>& result, vector<vect
 
 	}
 
-	ofstream outfile("../data/tree_nege.txt");
+	/*ofstream outfile("../data/tree_nege.txt");
 	for (int i = 1; i <= 500; ++i)
 	{
 		outfile << i << " " << result[i] << endl;
 	}
-	outfile.close();
+	outfile.close();*/
 }
 
 void read_bound(string bound_path, vector<ld>& var_bound, vector<ld>& mean_posi_bound, vector<ld>& mean_nege_bound)
@@ -2083,4 +2100,90 @@ void read_bound(string bound_path, vector<ld>& var_bound, vector<ld>& mean_posi_
 	}
 	infile.close();
 
+}
+
+
+
+void path_find(ld left_time, ld right_time, vector<vector<int>>& childs, vector<vector<int>>& solution, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<ld>& ini_delays, vector<vector<int>>& origins, ld var_limit)
+{
+	
+	vector<bool> is_in_tree(10001, false);
+	vector<ld> tree_var(501), tree_posi(501), tree_nege(501);
+
+	
+	//优先规划ship0, 再ship11
+	vector<int> ship_0_rec_path, ship_11_rec_path;
+	ld ship_0_rec_var = 1, ship_11_rec_var = 1;
+
+	vector<int> ship_0_path, ship_11_path;
+
+	make_tree_var(childs, tree_var, vars, is_int_tree, ship_0_path);
+	make_tree_posi(childs, tree_posi, means, is_in_tree, ship_0_path);
+	make_tree_nege(childs, tree_nege, means, is_in_tree, ship_0_path);
+
+	for (auto origin : origins[0])
+	{
+		
+	}
+
+
+	//优先ship11，再ship0
+
+}
+
+
+void dfs_path_find(int ship, ld left_time, ld right_time, vector<vector<int>>& childs, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<int>& path, ld current_delay, int node, ld current_var, vector<ld>& tree_var, vector<ld>& tree_posi, vector<ld>& tree_nege, vector<bool>& is_in_tree, vector<int>& rec_path, ld& rec_var)
+{
+	if (node == 105)
+	{
+		if (current_delay > left_time && current_delay < right_time)
+		{
+			if (current_var < rec_var)
+			{
+				rec_path = path;
+				rec_var = current_var;
+				//cout << "found best " << rec_var << endl;
+			}
+		}
+
+		return;
+	}
+	if (current_var > rec_var)
+	{
+		//cout << "exceed" << endl;
+		return;
+	}
+
+	vector<bool> old_is_in_tree = is_in_tree;
+	vector<ld> old_tree_var = tree_var, old_tree_posi = tree_posi, old_tree_nege = tree_nege;
+
+
+	if (is_in_tree[node])
+	{
+		//当前使用的最小生成树包含了node，要重新算
+		is_in_tree.assign(10001, false);
+		make_tree_var(childs, tree_var, vars, is_in_tree, path);
+		make_tree_posi(childs, tree_posi, means, is_in_tree, path);
+		make_tree_nege(childs, tree_nege, means, is_in_tree, path);
+	}
+	//todo:检查满足时间窗还要多少跳，经过这些跳之后最少还要多少cost
+	
+
+
+	for (auto child : childs[node])
+	{
+		if (find(path.begin(), path.end(), child) != path.end())
+			continue;
+
+		path.emplace_back(child);
+		dfs_path_find(ship, left_time, right_time, childs, means, vars, path, current_delay + means[node][child], child, current_var + vars[node][child], tree_var, tree_posi, tree_nege, is_in_tree, rec_path, rec_var);
+		path.erase(path.end() - 1);
+	}
+
+	is_in_tree = old_is_in_tree;
+	tree_var = old_tree_var;
+	tree_posi = old_tree_posi;
+	tree_nege = old_tree_nege;
+
+	return;
 }

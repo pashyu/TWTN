@@ -64,12 +64,14 @@ void dfs_refine(int ship, int destination, vector<vector<int>>& childs, vector<i
 
 void transfer_file(string filename);
 
-void make_tree_var(vector<vector<int>>& childs, vector<ld>& result, vector<vector<ld>>& vars);
+void make_tree_var(vector<vector<int>>& childs, vector<ld>& result, vector<vector<ld>>& vars, vector<bool>& is_in_tree, vector<int>& path);
 
-void make_tree_posi(vector<vector<int>>& childs, vector<ld>& result, vector<vector<ld>>& means);
+void make_tree_posi(vector<vector<int>>& childs, vector<ld>& result, vector<vector<ld>>& means, vector<bool>& is_in_tree, vector<int>& path);
 
-void make_tree_nege(vector<vector<int>>& childs, vector<ld>& result, vector<vector<ld>>& means);
+void make_tree_nege(vector<vector<int>>& childs, vector<ld>& result, vector<vector<ld>>& means, vector<bool>& is_in_tree, vector<int>& path);
 
 void read_bound(string bound_path, vector<ld>& var_bound, vector<ld>& mean_posi_bound, vector<ld>& mean_nege_bound);
 
-void A_star_path_find(vector<vector<int>>)
+void path_find(ld left_time, ld right_time, vector<vector<int>>& childs, vector<vector<int>>& solution, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<ld>& ini_delays, vector<vector<int>>& origins, ld var_limit, vector<ld>& tree_var, vector<ld>& tree_posi, vector<ld>& tree_nege);
+
+void dfs_path_find(int ship, ld left_time, ld right_time, vector<vector<int>>& childs, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<int>& path, ld current_delay, int node, ld current_var, vector<ld>& tree_var, vector<ld>& tree_posi, vector<ld>& tree_nege, vector<bool>& is_in_tree, vector<int>& rec_path, ld& rec_var)
