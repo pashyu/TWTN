@@ -41,7 +41,8 @@ int main(int argc, char* argv[])
 	//check_solution(solution, visited, means, vars, ini_delays);
 	//write_solution(solution, filename);
 	//refinement(solution, childs, means, vars, ini_delays, 0.0296, -0.507, 0.493);
-
+	path_find(-0.5, 0.5, childs, solution, means, vars, ini_delays, origins, 0.0275);
+	write_solution(solution, "../data/dfs_ship0.txt");
 	//check_solution(solution, visited, means, vars, ini_delays);
 	//get_mean_andvar(childs, means, vars);
 	

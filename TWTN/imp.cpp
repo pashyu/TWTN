@@ -740,8 +740,9 @@ void write_solution(vector<vector<int>>& solution, string filename)
 	name = filename.substr(path_pos + 1);
 	filepath += "exceed-timewindow\\";
 	
-	ofstream outfile(filepath + name);
-	for (int ship = 0; ship < 12; ship+=11)
+	//ofstream outfile(filepath + name);
+	ofstream outfile(filename);
+	for (int ship = 0; ship < 12; ship+=12)
 	{
 		vector<int>& route = solution[ship];
 
@@ -1903,7 +1904,7 @@ void make_tree_var(vector<vector<int>>& childs, vector<ld>& result, vector<vecto
 	outfile.close();*/
 }
 
-void make_tree_posi(vector<vector<int>>& childs, vector<ld>& result, vector<vector<ld>>& means, vector<bool>& is_in_tree, vector<bool>& is_in_tree, vector<int>& path)
+void make_tree_posi(vector<vector<int>>& childs, vector<ld>& result, vector<vector<ld>>& means, vector<bool>& is_in_tree, vector<int>& path)
 {
 	vector<vector<int>> reverse_childs(10001, vector<int>());
 
@@ -1984,7 +1985,7 @@ void make_tree_posi(vector<vector<int>>& childs, vector<ld>& result, vector<vect
 	outfile.close();*/
 }
 
-void make_tree_nege(vector<vector<int>>& childs, vector<ld>& result, vector<vector<ld>>& means, vector<bool>& is_in_tree, vector<bool>& is_in_tree, vector<int>& path)
+void make_tree_nege(vector<vector<int>>& childs, vector<ld>& result, vector<vector<ld>>& means, vector<bool>& is_in_tree, vector<int>& path)
 {
 	vector<vector<int>> reverse_childs(10001, vector<int>());
 
@@ -2113,26 +2114,28 @@ void path_find(ld left_time, ld right_time, vector<vector<int>>& childs, vector<
 	
 	//优先规划ship0, 再ship11
 	vector<int> ship_0_rec_path, ship_11_rec_path;
-	ld ship_0_rec_var = 1, ship_11_rec_var = 1;
+	ld ship_0_rec_var = 0.0275, ship_11_rec_var = 1;
 
 	vector<int> ship_0_path, ship_11_path;
 
-	make_tree_var(childs, tree_var, vars, is_int_tree, ship_0_path);
+	make_tree_var(childs, tree_var, vars, is_in_tree, ship_0_path);
 	make_tree_posi(childs, tree_posi, means, is_in_tree, ship_0_path);
 	make_tree_nege(childs, tree_nege, means, is_in_tree, ship_0_path);
 
 	for (auto origin : origins[0])
 	{
-		
+		ship_0_path.emplace_back(origin);
+		dfs_path_find(0, left_time, right_time, childs, means, vars, ship_0_path, ini_delays[0], origin, 0, tree_var, tree_posi, tree_nege, is_in_tree, ship_0_rec_path, ship_0_rec_var, 0);
+		ship_0_path.clear();
 	}
-
+	solution[0] = ship_0_rec_path;	
 
 	//优先ship11，再ship0
 
 }
 
 
-void dfs_path_find(int ship, ld left_time, ld right_time, vector<vector<int>>& childs, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<int>& path, ld current_delay, int node, ld current_var, vector<ld>& tree_var, vector<ld>& tree_posi, vector<ld>& tree_nege, vector<bool>& is_in_tree, vector<int>& rec_path, ld& rec_var)
+void dfs_path_find(int ship, ld left_time, ld right_time, vector<vector<int>>& childs, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<int>& path, ld current_delay, int node, ld current_var, vector<ld>& tree_var, vector<ld>& tree_posi, vector<ld>& tree_nege, vector<bool>& is_in_tree, vector<int>& rec_path, ld& rec_var, int depth)
 {
 	if (node == 105)
 	{
@@ -2142,7 +2145,7 @@ void dfs_path_find(int ship, ld left_time, ld right_time, vector<vector<int>>& c
 			{
 				rec_path = path;
 				rec_var = current_var;
-				//cout << "found best " << rec_var << endl;
+				cout << "found best " << rec_var << endl;
 			}
 		}
 
@@ -2151,6 +2154,7 @@ void dfs_path_find(int ship, ld left_time, ld right_time, vector<vector<int>>& c
 	if (current_var > rec_var)
 	{
 		//cout << "exceed" << endl;
+		//cout << "cut at depth " << depth << endl;
 		return;
 	}
 
@@ -2167,16 +2171,58 @@ void dfs_path_find(int ship, ld left_time, ld right_time, vector<vector<int>>& c
 		make_tree_nege(childs, tree_nege, means, is_in_tree, path);
 	}
 	//todo:检查满足时间窗还要多少跳，经过这些跳之后最少还要多少cost
-	
+	if (current_delay < left_time)
+	{
+		int hops = 500;
+		for (int k = 1; k <= 500; ++k)
+		{
+			if (current_delay + tree_posi[k] > left_time)
+			{
+				hops = k;
+				break;
+			}
+		}
+		if (current_var + tree_var[hops] > rec_var)
+		{
+			is_in_tree = old_is_in_tree;
+			tree_var = old_tree_var;
+			tree_posi = old_tree_posi;
+			tree_nege = old_tree_nege;
+			//cout << "cut at depth " << depth <<" var : "<<current_var << endl;
+			return;
+		}
+	}
+	else if (current_delay > right_time)
+	{
+		int hops = 500;
+		for (int k = 1; k <= 500; ++k)
+		{
+			if (current_delay + tree_nege[k] < right_time)
+			{
+				hops = k;
+				break;
+			}
+		}
+		if (current_var + tree_var[hops] > rec_var)
+		{
+			is_in_tree = old_is_in_tree;
+			tree_var = old_tree_var;
+			tree_posi = old_tree_posi;
+			tree_nege = old_tree_nege;
+			//cout << "cut at depth " << depth << " var : " << current_var << endl;
+			return;
+		}
+	}
 
 
 	for (auto child : childs[node])
 	{
 		if (find(path.begin(), path.end(), child) != path.end())
 			continue;
-
+		if (vars[node][child] > 3e-3)
+			continue;
 		path.emplace_back(child);
-		dfs_path_find(ship, left_time, right_time, childs, means, vars, path, current_delay + means[node][child], child, current_var + vars[node][child], tree_var, tree_posi, tree_nege, is_in_tree, rec_path, rec_var);
+		dfs_path_find(ship, left_time, right_time, childs, means, vars, path, current_delay + means[node][child], child, current_var + vars[node][child], tree_var, tree_posi, tree_nege, is_in_tree, rec_path, rec_var, depth + 1);
 		path.erase(path.end() - 1);
 	}
 
