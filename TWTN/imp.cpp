@@ -4,12 +4,12 @@
 #include<sstream>
 #include<iomanip>
 #include<iostream>
-
+#include<filesystem>
 
 void read_edge_and_meanvar(vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<vector<int>>& neighbors)
 {
 	ld mean, var;
-	ifstream infile_meanvar("../data/meanvar.txt"), infile_edge("../data/edges.txt");
+	ifstream infile_meanvar("..\\data\\meanvar.txt"), infile_edge("..\\data\\edges.txt");
 	string linestr_meanvar, linestr_edge;
 	int cnt = 0;
 	while (infile_meanvar.good())
@@ -37,7 +37,7 @@ void read_edge_and_meanvar(vector<vector<ld>>& means, vector<vector<ld>>& vars, 
 
 void read_origin(vector<vector<int>>& origins)
 {
-	ifstream infile("../data/origins.txt");
+	ifstream infile("..\\data\\origins.txt");
 	string linestr;
 	//每个飞船有14个候选起点
 	for (int i = 0; i < 12; ++i)
@@ -79,7 +79,7 @@ void read_edge(vector<vector<int>>& neighbors)
 
 void read_ini_delays(vector<ld>& ini_delays)
 {
-	ifstream infile("../data/delays.txt");
+	ifstream infile("..\\data\\delays.txt");
 
 	for (int i = 0; i < 12; ++i)
 	{
@@ -96,7 +96,7 @@ void read_ini_delays(vector<ld>& ini_delays)
 
 void read_shortest(vector<vector<int>>& shortest_path, vector<ld>& shortest_mean, vector<ld>& shortest_var)
 {
-	ifstream infile("../data/shortest_path.txt");
+	ifstream infile("..\\data\\shortest_path.txt");
 	string linestr;
 	for (int node = 1; node <= 10000; ++node)
 	{
@@ -735,10 +735,10 @@ void write_solution(vector<vector<int>>& solution, string filename)
 {
 	string filepath, name;
 
-	int path_pos = filename.find_last_of('\\');
+	/*int path_pos = filename.find_last_of('\\');
 	filepath = filename.substr(0, path_pos + 1);
 	name = filename.substr(path_pos + 1);
-	filepath += "exceed-timewindow\\";
+	filepath += "exceed-timewindow\\";*/
 	
 	//ofstream outfile(filepath + name);
 	ofstream outfile(filename);
@@ -1904,6 +1904,7 @@ void make_tree_var(vector<vector<int>>& childs, vector<ld>& result, vector<vecto
 	outfile.close();*/
 }
 
+
 void make_tree_posi(vector<vector<int>>& childs, vector<ld>& result, vector<vector<ld>>& means, vector<bool>& is_in_tree, vector<int>& path)
 {
 	vector<vector<int>> reverse_childs(10001, vector<int>());
@@ -2105,7 +2106,7 @@ void read_bound(string bound_path, vector<ld>& var_bound, vector<ld>& mean_posi_
 
 
 
-void path_find(ld left_time, ld right_time, vector<vector<int>>& childs, vector<vector<int>>& solution, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<ld>& ini_delays, vector<vector<int>>& origins, ld var_limit)
+void path_find(ld left_time, ld right_time, vector<vector<int>>& childs, vector<vector<int>>& solution, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<ld>& ini_delays, vector<vector<int>>& origins, ld var_limit, vector<ld>& shortest_var)
 {
 	
 	vector<bool> is_in_tree(10001, false);
@@ -2114,7 +2115,7 @@ void path_find(ld left_time, ld right_time, vector<vector<int>>& childs, vector<
 	
 	//优先规划ship0, 再ship11
 	vector<int> ship_0_rec_path, ship_11_rec_path;
-	ld ship_0_rec_var = 0.0275, ship_11_rec_var = 1;
+	ld ship_0_rec_var = var_limit , ship_11_rec_var = var_limit;
 
 	vector<int> ship_0_path, ship_11_path;
 
@@ -2125,7 +2126,8 @@ void path_find(ld left_time, ld right_time, vector<vector<int>>& childs, vector<
 	for (auto origin : origins[0])
 	{
 		ship_0_path.emplace_back(origin);
-		dfs_path_find(0, left_time, right_time, childs, means, vars, ship_0_path, ini_delays[0], origin, 0, tree_var, tree_posi, tree_nege, is_in_tree, ship_0_rec_path, ship_0_rec_var, 0);
+		vector<ld> last_attempt(10001, 1);
+		dfs_path_find(0, left_time, right_time, childs, means, vars, ship_0_path, ini_delays[0], origin, 0, tree_var, tree_posi, tree_nege, is_in_tree, ship_0_rec_path, ship_0_rec_var, shortest_var, 0, last_attempt);
 		ship_0_path.clear();
 	}
 	solution[0] = ship_0_rec_path;	
@@ -2135,7 +2137,7 @@ void path_find(ld left_time, ld right_time, vector<vector<int>>& childs, vector<
 }
 
 
-void dfs_path_find(int ship, ld left_time, ld right_time, vector<vector<int>>& childs, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<int>& path, ld current_delay, int node, ld current_var, vector<ld>& tree_var, vector<ld>& tree_posi, vector<ld>& tree_nege, vector<bool>& is_in_tree, vector<int>& rec_path, ld& rec_var, int depth)
+void dfs_path_find(int ship, ld left_time, ld right_time, vector<vector<int>>& childs, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<int>& path, ld current_delay, int node, ld current_var, vector<ld>& tree_var, vector<ld>& tree_posi, vector<ld>& tree_nege, vector<bool>& is_in_tree, vector<int>& rec_path, ld& rec_var, vector<ld>& shortest_var, int depth, vector<ld>& last_attempt)
 {
 	if (node == 105)
 	{
@@ -2170,7 +2172,7 @@ void dfs_path_find(int ship, ld left_time, ld right_time, vector<vector<int>>& c
 		make_tree_posi(childs, tree_posi, means, is_in_tree, path);
 		make_tree_nege(childs, tree_nege, means, is_in_tree, path);
 	}
-	//todo:检查满足时间窗还要多少跳，经过这些跳之后最少还要多少cost
+	//检查满足时间窗还要多少跳，经过这些跳之后最少还要多少cost
 	if (current_delay < left_time)
 	{
 		int hops = 500;
@@ -2182,6 +2184,7 @@ void dfs_path_find(int ship, ld left_time, ld right_time, vector<vector<int>>& c
 				break;
 			}
 		}
+		
 		if (current_var + tree_var[hops] > rec_var)
 		{
 			is_in_tree = old_is_in_tree;
@@ -2214,15 +2217,89 @@ void dfs_path_find(int ship, ld left_time, ld right_time, vector<vector<int>>& c
 		}
 	}
 
-
+	//选一些child拓展，不考虑全部的了
+	vector<int> posi_childs;
+	vector<int> nege_childs;
 	for (auto child : childs[node])
 	{
 		if (find(path.begin(), path.end(), child) != path.end())
 			continue;
 		if (vars[node][child] > 3e-3)
 			continue;
+		if (child != 105 && current_var + vars[node][child] + shortest_var[child] > rec_var)
+			continue;
+		if (child == 105)
+			continue;
+		if (means[node][child] > 0)
+		{
+			posi_childs.emplace_back(child);
+		}
+		else
+		{
+			nege_childs.emplace_back(child);
+		}
+	}
+	vector<int> childs_pool;
+	//可供选择的child分为了posi和nege,其中可能有一个包含105
+	int same_direc = 10, oppo_direc = 3;
+	if (vars[node][105] > 0)
+	{
+		childs_pool.emplace_back(105);
+	}
+
+	sort(posi_childs.begin(), posi_childs.end(), [&](int childa, int childb) {return vars[node][childa] < vars[node][childb]; });
+	sort(nege_childs.begin(), nege_childs.end(), [&](int childa, int childb) {return vars[node][childa] < vars[node][childb]; });
+	if (current_delay < left_time)
+	{
+		same_direc = min(same_direc, (int)posi_childs.size());
+		for (int i = 0; i < same_direc; ++i)
+		{
+			childs_pool.emplace_back(posi_childs[i]);
+		}
+
+		oppo_direc = min(oppo_direc, (int)nege_childs.size());
+		for (int i = 0; i < oppo_direc; ++i)
+		{
+			childs_pool.emplace_back(nege_childs[i]);
+		}
+
+	}
+	else if (current_delay > right_time)
+	{
+		same_direc = min(same_direc, (int)nege_childs.size());
+		for (int i = 0; i < same_direc; ++i)
+		{
+			childs_pool.emplace_back(nege_childs[i]);
+		}
+
+		oppo_direc = min(oppo_direc, (int)posi_childs.size());
+		for (int i = 0; i < oppo_direc; ++i)
+		{
+			childs_pool.emplace_back(posi_childs[i]);
+		}
+
+	}
+	else
+	{
+		same_direc = 5, oppo_direc = 5;
+		same_direc = min(same_direc, (int)posi_childs.size());
+		for (int i = 0; i < same_direc; ++i)
+		{
+			childs_pool.emplace_back(posi_childs[i]);
+		}
+
+		oppo_direc = min(oppo_direc, (int)nege_childs.size());
+		for (int i = 0; i < oppo_direc; ++i)
+		{
+			childs_pool.emplace_back(nege_childs[i]);
+		}
+	}
+
+
+	for (auto child : childs_pool)
+	{
 		path.emplace_back(child);
-		dfs_path_find(ship, left_time, right_time, childs, means, vars, path, current_delay + means[node][child], child, current_var + vars[node][child], tree_var, tree_posi, tree_nege, is_in_tree, rec_path, rec_var, depth + 1);
+		dfs_path_find(ship, left_time, right_time, childs, means, vars, path, current_delay + means[node][child], child, current_var + vars[node][child], tree_var, tree_posi, tree_nege, is_in_tree, rec_path, rec_var, shortest_var, depth + 1, last_attempt);
 		path.erase(path.end() - 1);
 	}
 
@@ -2232,4 +2309,60 @@ void dfs_path_find(int ship, ld left_time, ld right_time, vector<vector<int>>& c
 	tree_nege = old_tree_nege;
 
 	return;
+}
+
+void read_inis(vector<vector<vector<int>>>& ini_solutions)
+{
+	int cnt = 0;
+	ini_solutions.resize(112);
+	for (auto& ini : ini_solutions)
+		ini.resize(12);
+	for (auto& i : filesystem::directory_iterator("..\\data\\ini-solutions"))
+	{
+		string filename = i.path().string();
+		ifstream infile(filename);
+		int node = 0;
+		while (node != 105)
+		{
+			infile >> node;
+			ini_solutions[cnt][0].emplace_back(node);
+		}
+		node = 0;
+		while (node != 105)
+		{
+			infile >> node;
+			ini_solutions[cnt][11].emplace_back(node);
+		}
+		infile.close();
+		++cnt;
+	}
+}
+
+void check_simi(vector<vector<vector<int>>>& ini_solutions)
+{
+	int a = 0, b = 0;
+	int ship_0_min_simi = 300, ship_11_min_simi = 300;
+	for (a = 0; a<112;++a)
+	{
+		for (b = a + 1; b < 112; ++b)
+		{
+			int cnt = 0;
+			for (auto node : ini_solutions[a][0])
+			{
+				if (find(ini_solutions[b][0].begin(), ini_solutions[b][0].end(), node) != ini_solutions[b][0].end())
+					++cnt;
+			}
+			ship_0_min_simi = min(ship_0_min_simi, cnt);
+			cnt = 0;
+			for (auto node : ini_solutions[a][11])
+			{
+				if (find(ini_solutions[b][11].begin(), ini_solutions[b][11].end(), node) != ini_solutions[b][11].end())
+					++cnt;
+			}
+			ship_11_min_simi = min(ship_11_min_simi, cnt);
+		}
+		
+	}
+	cout << "ship 0 min simi: " << ship_0_min_simi << endl;    //253
+	cout << "ship 11 min simi: " << ship_11_min_simi << endl;   //238
 }
