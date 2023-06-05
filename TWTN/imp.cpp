@@ -2241,7 +2241,7 @@ void dfs_path_find(int ship, ld left_time, ld right_time, vector<vector<int>>& c
 	}
 	vector<int> childs_pool;
 	//可供选择的child分为了posi和nege,其中可能有一个包含105
-	int same_direc = 10, oppo_direc = 3;
+	int same_direc = 5, oppo_direc = 2;
 	if (vars[node][105] > 0)
 	{
 		childs_pool.emplace_back(105);
@@ -2281,7 +2281,7 @@ void dfs_path_find(int ship, ld left_time, ld right_time, vector<vector<int>>& c
 	}
 	else
 	{
-		same_direc = 5, oppo_direc = 5;
+		same_direc = 3, oppo_direc = 3;
 		same_direc = min(same_direc, (int)posi_childs.size());
 		for (int i = 0; i < same_direc; ++i)
 		{
@@ -2311,10 +2311,12 @@ void dfs_path_find(int ship, ld left_time, ld right_time, vector<vector<int>>& c
 	return;
 }
 
-void read_inis(vector<vector<vector<int>>>& ini_solutions)
+void read_inis(vector<vector<vector<int>>>& ini_solutions, vector<pair<ld, ld>>& ini_solution_delays, vector<pair<ld, ld>>& ini_solution_vars, vector<ld>& ini_delays, vector<vector<ld>>& means, vector<vector<ld>>& vars)
 {
 	int cnt = 0;
 	ini_solutions.resize(112);
+	ini_solution_delays.resize(112);
+	ini_solution_vars.resize(112);
 	for (auto& ini : ini_solutions)
 		ini.resize(12);
 	for (auto& i : filesystem::directory_iterator("..\\data\\ini-solutions"))
@@ -2327,15 +2329,46 @@ void read_inis(vector<vector<vector<int>>>& ini_solutions)
 			infile >> node;
 			ini_solutions[cnt][0].emplace_back(node);
 		}
+
 		node = 0;
 		while (node != 105)
 		{
 			infile >> node;
 			ini_solutions[cnt][11].emplace_back(node);
 		}
+
 		infile.close();
 		++cnt;
 	}
+
+	for (int i = 0; i < 112; ++i)
+	{
+		ld delay = ini_delays[0];
+		ld var = 0;
+		vector<int>& ship_0 = ini_solutions[i][0];
+		for (int j = 1; j < ship_0.size(); ++j)
+		{
+			int node = ship_0[j], prenode = ship_0[j - 1];
+			delay += means[prenode][node];
+			var += vars[prenode][node];
+		}
+		ini_solution_delays[i].first = delay;
+		ini_solution_vars[i].first = var;
+
+		delay = ini_delays[11];
+		var = 0;
+		vector<int>& ship_11 = ini_solutions[i][11];
+		for (int j = 1; j < ship_11.size(); ++j)
+		{
+			int node = ship_11[j], prenode = ship_11[j - 1];
+			delay += means[prenode][node];
+			var += vars[prenode][node];
+		}
+		ini_solution_delays[i].second = delay;
+		ini_solution_vars[i].second = var;
+	}
+	/*cout << ini_solution_delays[0].second - ini_solution_delays[0].first << endl;
+	cout << ini_solution_vars[0].first << "  " << ini_solution_vars[0].second << endl;*/
 }
 
 void check_simi(vector<vector<vector<int>>>& ini_solutions)
@@ -2365,4 +2398,74 @@ void check_simi(vector<vector<vector<int>>>& ini_solutions)
 	}
 	cout << "ship 0 min simi: " << ship_0_min_simi << endl;    //253
 	cout << "ship 11 min simi: " << ship_11_min_simi << endl;   //238
+}
+
+void inis_crossover(int index, vector<vector<vector<int>>>& ini_solutions, vector<pair<ld, ld>>& ini_solution_delays, vector<pair<ld, ld>>& ini_solution_vars, vector<ld>& ini_delays, vector<vector<ld>>& means, vector<vector<ld>>& vars)
+{
+	//用路径交叉的方式尝试修复ini_solutions中index下标的两个ship的路线
+	
+	vector<int>& ship_0_path = ini_solutions[index][0], &ship_11_path = ini_solutions[index][11];
+
+	ld ship_0_old_delay = ini_solution_delays[index].first, ship_11_old_delay = ini_solution_delays[index].second;
+	ld ship_0_old_var = ini_solution_vars[index].first, ship_11_old_var = ini_solution_vars[index].second;
+
+	for (int i = 0; ship_0_path[i] != 105; ++i)
+	{
+		int node = ship_0_path[i];
+		if (find(ship_11_path.begin(), ship_11_path.end(), node) != ship_11_path.end())
+		{
+			//消解冲突
+			int pos_in_ship0 = i, pos_in_ship11 = find(ship_11_path.begin(), ship_11_path.end(), node) - ship_11_path.begin();
+			int ship_0_rightpos = i, ship_0_leftpos = i;
+			int ship_11_rightpos = pos_in_ship11, ship_11_leftpos = pos_in_ship11;
+
+
+			bool conflict = true;
+			while (conflict)
+			{
+				//ship0和ship11分别尝试往左右探一个
+				int old_gap_0 = ship_0_rightpos - ship_0_leftpos;
+				if (ship_0_leftpos > 0)
+					--ship_0_leftpos;
+				if (ship_0_path[ship_0_rightpos] != 105)
+					++ship_0_rightpos;
+				while (ship_0_rightpos != 105 && find(ship_11_path.begin(), ship_11_path.end(), ship_0_path[ship_0_rightpos]) != ship_11_path.end())
+					++ship_0_rightpos;
+
+				int old_gap_11 = ship_11_rightpos - ship_11_leftpos;
+				if (ship_11_leftpos > 0)
+					--ship_11_leftpos;
+				if (ship_11_path[ship_11_rightpos] != 105)
+					++ship_11_rightpos;
+				while (ship_11_rightpos != 105 && find(ship_0_path.begin(), ship_0_path.end(), ship_11_path[ship_11_rightpos]) != ship_0_path.end())
+					++ship_11_rightpos;
+
+				if (ship_0_rightpos - ship_0_leftpos == old_gap_0 && ship_11_rightpos - ship_11_leftpos == old_gap_11)
+					break;
+
+				for (int j = 0; j < 112; ++j)
+				{
+					if (j == index)
+						continue;
+
+
+
+				}
+
+
+			}
+
+
+			if (conflict)
+			{
+				//没能消解掉
+			}
+			else
+			{
+				
+			}
+
+
+		}
+	}
 }

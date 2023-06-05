@@ -31,7 +31,8 @@ int main(int argc, char* argv[])
 	vector<ld> ini_delays(12);
 	vector<ld> var_bound(501, 0), mean_posi_bound(501, 0), mean_nege_bound(501, 0);
 	vector<vector<bool>> dominated(10001, vector<bool>(10001, false));
-	
+	vector<pair<ld, ld>> ini_solution_delays, ini_solution_vars;
+
 	read_edge_and_meanvar(means, vars, childs);
 	read_bound("..\\data\\", var_bound, mean_posi_bound, mean_nege_bound);
 	read_origin(origins);
@@ -46,15 +47,15 @@ int main(int argc, char* argv[])
 	//check_solution(solution, visited, means, vars, ini_delays);
 	//write_solution(solution, filename);
 	//refinement(solution, childs, means, vars, ini_delays, 0.0296, -0.507, 0.493);
-	auto start = system_clock::now();
-	path_find(-0.5, 0.5, childs, solution, means, vars, ini_delays, origins, 0.0600, shortest_var);
+	/*auto start = system_clock::now();
+	path_find(-0.5, 0.5, childs, solution, means, vars, ini_delays, origins, 0.0275, shortest_var);
 	auto end = system_clock::now();
 	auto duration = duration_cast<seconds>(end - start);
 	cout << duration.count() << endl;
-	write_solution(solution, "..\\data\\dfs_ship0.txt");
+	write_solution(solution, "..\\data\\dfs_ship0-short_time.txt");*/
 	//check_solution(solution, visited, means, vars, ini_delays);
 	//get_mean_andvar(childs, means, vars);
-	//read_inis(ini_solutions);
+	read_inis(ini_solutions, ini_solution_delays, ini_solution_vars, ini_delays, means, vars);
 	//check_simi(ini_solutions);
 	//cout << (INT_MIN >> 1) << endl;
 	return 0;
