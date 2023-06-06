@@ -2241,7 +2241,7 @@ void dfs_path_find(int ship, ld left_time, ld right_time, vector<vector<int>>& c
 	}
 	vector<int> childs_pool;
 	//可供选择的child分为了posi和nege,其中可能有一个包含105
-	int same_direc = 5, oppo_direc = 2;
+	int same_direc = 3, oppo_direc = 1;
 	if (vars[node][105] > 0)
 	{
 		childs_pool.emplace_back(105);
@@ -2281,7 +2281,7 @@ void dfs_path_find(int ship, ld left_time, ld right_time, vector<vector<int>>& c
 	}
 	else
 	{
-		same_direc = 3, oppo_direc = 3;
+		same_direc = 2, oppo_direc = 2;
 		same_direc = min(same_direc, (int)posi_childs.size());
 		for (int i = 0; i < same_direc; ++i)
 		{
@@ -2429,7 +2429,7 @@ void inis_crossover(int index, vector<vector<vector<int>>>& ini_solutions, vecto
 					--ship_0_leftpos;
 				if (ship_0_path[ship_0_rightpos] != 105)
 					++ship_0_rightpos;
-				while (ship_0_rightpos != 105 && find(ship_11_path.begin(), ship_11_path.end(), ship_0_path[ship_0_rightpos]) != ship_11_path.end())
+				while (ship_0_path[ship_0_rightpos] != 105 && find(ship_11_path.begin(), ship_11_path.end(), ship_0_path[ship_0_rightpos]) != ship_11_path.end())
 					++ship_0_rightpos;
 
 				int old_gap_11 = ship_11_rightpos - ship_11_leftpos;
@@ -2437,35 +2437,153 @@ void inis_crossover(int index, vector<vector<vector<int>>>& ini_solutions, vecto
 					--ship_11_leftpos;
 				if (ship_11_path[ship_11_rightpos] != 105)
 					++ship_11_rightpos;
-				while (ship_11_rightpos != 105 && find(ship_0_path.begin(), ship_0_path.end(), ship_11_path[ship_11_rightpos]) != ship_0_path.end())
+				while (ship_11_path[ship_11_rightpos] != 105 && find(ship_0_path.begin(), ship_0_path.end(), ship_11_path[ship_11_rightpos]) != ship_0_path.end())
 					++ship_11_rightpos;
 
 				if (ship_0_rightpos - ship_0_leftpos == old_gap_0 && ship_11_rightpos - ship_11_leftpos == old_gap_11)
 					break;
 
+
+				int ship0_start_node = ship_0_path[ship_0_leftpos], ship0_end_node = ship_0_path[ship_0_rightpos];
+				int ship11_start_node = ship_11_path[ship_11_leftpos], ship11_end_node = ship_11_path[ship_11_rightpos];
+
+
+				ld ship0_partial_delay = 0, ship0_partial_var = 0;
+				ld ship0_replace_delay = 1, ship0_replace_var = 1;
+				vector<int> ship0_replace_route;
+
+				ld ship11_partial_delay = 0, ship11_partial_var = 0;
+				ld ship11_replace_delay = 1, ship11_replace_var = 1;
+				vector<int> ship11_replace_route;
+
+				for (int pos = ship_0_leftpos + 1; pos <= ship_0_rightpos; ++pos)
+				{
+					int node = ship_0_path[pos], prenode = ship_0_path[pos - 1];
+					ship0_partial_delay += means[prenode][node];
+					ship0_partial_var += vars[prenode][node];
+				}
+
+				for (int pos = ship_11_leftpos + 1; pos <= ship_11_rightpos; ++pos)
+				{
+					int node = ship_11_path[pos], prenode = ship_11_path[pos - 1];
+					ship11_partial_delay += means[prenode][node];
+					ship11_partial_var += vars[prenode][node];
+				}
 				for (int j = 0; j < 112; ++j)
 				{
 					if (j == index)
 						continue;
 
+					vector<int>& ship0_ref_path = ini_solutions[j][0];
+					vector<int>& ship11_ref_path = ini_solutions[j][11];
+
+					//ship0能不能换
+					if (find(ship0_ref_path.begin(), ship0_ref_path.end(), ship0_start_node) != ship0_ref_path.end()
+						&& find(ship0_ref_path.begin(), ship0_ref_path.end(), ship0_end_node) != ship0_ref_path.end())
+					{
+						int pos1 = find(ship0_ref_path.begin(), ship0_ref_path.end(), ship0_start_node) - ship0_ref_path.begin();
+						int pos2 = find(ship0_ref_path.begin(), ship0_ref_path.end(), ship0_end_node) - ship0_ref_path.begin();
+
+						if (pos2 > pos1)
+						{
+							ld ref_partial_delay = 0, ref_partial_var = 0;
+							bool repeat = false;
+							for (int pos = pos1 + 1; pos <= pos2; ++pos)
+							{
+								int node = ship0_ref_path[pos], prenode = ship0_ref_path[pos - 1];
+								ref_partial_delay += means[prenode][node];
+								ref_partial_var += vars[prenode][node];
+								if (pos != pos2 && !repeat)
+								{
+									if (count(ship_0_path.begin(), ship_0_path.begin() + ship_0_leftpos, node) != 0
+										|| count(ship_0_path.begin() + ship_0_rightpos, ship_0_path.end(), node) != 0)
+									{
+										repeat = true;
+									}
+									if (count(ship_11_path.begin(), ship_11_path.end(), node) != 0)
+									{
+										repeat = true;
+									}
+										
+								}
+							}
+							if (!repeat)
+							{
+								if (ref_partial_var < ship0_replace_var)
+								{
+									ship0_replace_var = ref_partial_var;
+									ship0_replace_delay = ref_partial_delay;
+									ship0_replace_route.clear();
+									for (int pos = pos1; pos <= pos2; ++pos)
+									{
+										ship0_replace_route.emplace_back(ship0_ref_path[pos]);
+									}
+								}
+							}
+
+
+						}
+					}
 
 
 				}
 
-
+				if (ship0_replace_route.size() > 0)
+				{
+					cout << "old route: " << endl;
+					for (int pos = ship_0_leftpos; pos <= ship_0_rightpos; ++pos)
+					{
+						cout << ship_0_path[pos] << "  ";
+					}
+					cout << endl;
+					for (int k = 0; k < ship_0_path.size(); ++k)
+					{
+						cout << ship_0_path[k] << "  ";
+					}
+					cout << endl;
+					ship_0_path.erase(ship_0_path.begin() + ship_0_leftpos, ship_0_path.begin() + ship_0_rightpos + 1);
+					ship_0_path.insert(ship_0_path.begin() + ship_0_leftpos, ship0_replace_route.begin(), ship0_replace_route.end());
+					cout << "new route: " << endl;
+					for (int pos = ship_0_leftpos; ship_0_path[pos] != ship0_end_node; ++pos)
+					{
+						cout << ship_0_path[pos] << "  ";
+					}
+					cout <<ship0_end_node<< endl;
+					for (int k = 0; k < ship_0_path.size(); ++k)
+					{
+						cout << ship_0_path[k] << "  ";
+					}
+					cout << endl;
+					conflict = false;
+				}
 			}
 
 
 			if (conflict)
 			{
 				//没能消解掉
+				cout << "no deal" << endl;
 			}
 			else
 			{
-				
+				cout << "make a deal" << endl;
 			}
 
 
 		}
 	}
+
+
+	cout << "check: " << endl;
+	ld new_var = 0;
+	for (int i = 1; i<ship_0_path.size(); ++i)
+	{
+		int node = ship_0_path[i], prenode = ship_0_path[i-1];
+		new_var += vars[prenode][node];
+		if (vars[prenode][node] < 0)
+		{
+			cout << prenode << " to " << node << endl;
+		}
+	}
+	cout << new_var << endl;
 }
