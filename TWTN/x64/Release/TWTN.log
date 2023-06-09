@@ -15,13 +15,14 @@ E:\TWTN\TWTN\imp.cpp(1789,40): warning C4267: “初始化”: 从“size_t”�
 E:\TWTN\TWTN\imp.cpp(1796,37): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
 E:\TWTN\TWTN\imp.cpp(1803,37): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
 E:\TWTN\TWTN\imp.cpp(1810,37): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
-E:\TWTN\TWTN\imp.cpp(2418,40): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
-E:\TWTN\TWTN\imp.cpp(2484,16): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
-E:\TWTN\TWTN\imp.cpp(2485,16): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
-  main.cpp
+E:\TWTN\TWTN\imp.cpp(2426,40): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(2496,16): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(2497,16): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(2545,16): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(2546,16): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
   正在生成代码
-  458 of 789 functions (58.0%) were compiled, the rest were copied from previous compilation.
-    42 functions were new in current compilation
-    80 functions had inline decision re-evaluated but remain unchanged
+  1 of 791 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    2 functions had inline decision re-evaluated but remain unchanged
   已完成代码的生成
   TWTN.vcxproj -> E:\TWTN\x64\Release\TWTN.exe

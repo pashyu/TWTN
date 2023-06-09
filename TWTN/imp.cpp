@@ -2117,7 +2117,7 @@ void path_find(ld left_time, ld right_time, vector<vector<int>>& childs, vector<
 	vector<int> ship_0_rec_path, ship_11_rec_path;
 	ld ship_0_rec_var = var_limit , ship_11_rec_var = var_limit;
 
-	vector<int> ship_0_path, ship_11_path;
+	vector<int> ship_0_path;
 
 	make_tree_var(childs, tree_var, vars, is_in_tree, ship_0_path);
 	make_tree_posi(childs, tree_posi, means, is_in_tree, ship_0_path);
@@ -2139,6 +2139,9 @@ void path_find(ld left_time, ld right_time, vector<vector<int>>& childs, vector<
 
 void dfs_path_find(int ship, ld left_time, ld right_time, vector<vector<int>>& childs, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<int>& path, ld current_delay, int node, ld current_var, vector<ld>& tree_var, vector<ld>& tree_posi, vector<ld>& tree_nege, vector<bool>& is_in_tree, vector<int>& rec_path, ld& rec_var, vector<ld>& shortest_var, int depth, vector<ld>& last_attempt)
 {
+	cout << depth << endl;
+	if (depth >= 500)
+		return;
 	if (node == 105)
 	{
 		if (current_delay > left_time && current_delay < right_time)
@@ -2218,11 +2221,15 @@ void dfs_path_find(int ship, ld left_time, ld right_time, vector<vector<int>>& c
 	}
 
 	//选一些child拓展，不考虑全部的了
+	int same_direc = 1, oppo_direc = 0;
 	vector<int> posi_childs;
 	vector<int> nege_childs;
+	//posi_childs.reserve(same_direc);
+	//nege_childs.reserve(same_direc);
+
 	for (auto child : childs[node])
 	{
-		if (find(path.begin(), path.end(), child) != path.end())
+		if (find(path.begin(), path.begin() + depth + 1, child) != path.begin() + depth + 1)
 			continue;
 		if (vars[node][child] > 3e-3)
 			continue;
@@ -2240,8 +2247,9 @@ void dfs_path_find(int ship, ld left_time, ld right_time, vector<vector<int>>& c
 		}
 	}
 	vector<int> childs_pool;
+	//childs_pool.reserve(2 * same_direc);
 	//可供选择的child分为了posi和nege,其中可能有一个包含105
-	int same_direc = 3, oppo_direc = 1;
+	
 	if (vars[node][105] > 0)
 	{
 		childs_pool.emplace_back(105);
@@ -2281,7 +2289,7 @@ void dfs_path_find(int ship, ld left_time, ld right_time, vector<vector<int>>& c
 	}
 	else
 	{
-		same_direc = 2, oppo_direc = 2;
+		same_direc = 1, oppo_direc = 0;
 		same_direc = min(same_direc, (int)posi_childs.size());
 		for (int i = 0; i < same_direc; ++i)
 		{
@@ -2469,6 +2477,10 @@ void inis_crossover(int index, vector<vector<vector<int>>>& ini_solutions, vecto
 					ship11_partial_delay += means[prenode][node];
 					ship11_partial_var += vars[prenode][node];
 				}
+
+				cout << "ship0 partial delay: " << ship0_partial_delay << endl;
+				cout << "ship11 partial delay: " << ship11_partial_delay << endl;
+
 				for (int j = 0; j < 112; ++j)
 				{
 					if (j == index)
@@ -2509,6 +2521,7 @@ void inis_crossover(int index, vector<vector<vector<int>>>& ini_solutions, vecto
 							}
 							if (!repeat)
 							{
+								cout << "ref delay : " << ref_partial_delay << endl;
 								if (ref_partial_var < ship0_replace_var)
 								{
 									ship0_replace_var = ref_partial_var;
@@ -2526,6 +2539,26 @@ void inis_crossover(int index, vector<vector<vector<int>>>& ini_solutions, vecto
 					}
 
 
+					if (find(ship11_ref_path.begin(), ship11_ref_path.end(), ship11_start_node) != ship11_ref_path.end()
+						&& find(ship11_ref_path.begin(), ship11_ref_path.end(), ship11_end_node) != ship11_ref_path.end())
+					{
+						int pos1 = find(ship11_ref_path.begin(), ship11_ref_path.end(), ship11_start_node) - ship11_ref_path.begin();
+						int pos2 = find(ship11_ref_path.begin(), ship11_ref_path.end(), ship11_end_node) - ship11_ref_path.begin();
+
+						if (pos2 > pos1)
+						{
+							ld ref_partial_delay = 0, ref_partial_var = 0;
+							bool repeat = false;
+
+							for (int pos = pos1 + 1; pos <= pos2; ++pos)
+							{
+								
+							}
+
+						}
+
+					}
+
 				}
 
 				if (ship0_replace_route.size() > 0)
@@ -2536,24 +2569,17 @@ void inis_crossover(int index, vector<vector<vector<int>>>& ini_solutions, vecto
 						cout << ship_0_path[pos] << "  ";
 					}
 					cout << endl;
-					for (int k = 0; k < ship_0_path.size(); ++k)
-					{
-						cout << ship_0_path[k] << "  ";
-					}
-					cout << endl;
+					
 					ship_0_path.erase(ship_0_path.begin() + ship_0_leftpos, ship_0_path.begin() + ship_0_rightpos + 1);
 					ship_0_path.insert(ship_0_path.begin() + ship_0_leftpos, ship0_replace_route.begin(), ship0_replace_route.end());
+
 					cout << "new route: " << endl;
 					for (int pos = ship_0_leftpos; ship_0_path[pos] != ship0_end_node; ++pos)
 					{
 						cout << ship_0_path[pos] << "  ";
 					}
 					cout <<ship0_end_node<< endl;
-					for (int k = 0; k < ship_0_path.size(); ++k)
-					{
-						cout << ship_0_path[k] << "  ";
-					}
-					cout << endl;
+					
 					conflict = false;
 				}
 			}
@@ -2580,10 +2606,7 @@ void inis_crossover(int index, vector<vector<vector<int>>>& ini_solutions, vecto
 	{
 		int node = ship_0_path[i], prenode = ship_0_path[i-1];
 		new_var += vars[prenode][node];
-		if (vars[prenode][node] < 0)
-		{
-			cout << prenode << " to " << node << endl;
-		}
 	}
 	cout << new_var << endl;
+	cout << "hops: " << ship_0_path.size() << endl;
 }
