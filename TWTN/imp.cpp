@@ -2609,18 +2609,23 @@ void build_path(vector<vector<int>>& childs, vector<vector<ld>>& means, vector<v
 
 	sort_edges(true, childs, means, vars, sorted_edges);
 
-	vector<bool> is_in_path(10001, false);
-	vector<int> out_going(10001, 0), in_coming(10001, 0);
+	vector<bool> rec_is_in_path(10001, false);
+	vector<int> rec_out_going(10001, 0), rec_in_coming(10001, 0);
 
 	ld delay = ini_delays[0];
 	ld var = 0;
 
-	vector<pair<int, int>> partial_paths;
-	select_edges(delay, var, -0.6, partial_paths, means, vars, sorted_edges, is_in_path, out_going, in_coming);
+	vector<pair<int, int>> rec_partial_paths;
+	select_edges(delay, var, -0.6, rec_partial_paths, means, vars, sorted_edges, rec_is_in_path, rec_out_going, rec_in_coming);
 
 	for (auto origin : origins[0])
 	{
-		
+		auto partial_paths = rec_partial_paths;
+
+		auto out_going = rec_out_going, in_coming = rec_in_coming;
+		auto is_in_path = rec_is_in_path;
+		//todo
+
 	}
 }
 

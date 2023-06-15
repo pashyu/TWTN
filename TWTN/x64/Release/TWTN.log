@@ -18,10 +18,8 @@ E:\TWTN\TWTN\imp.cpp(1811,37): warning C4267: “=”: 从“size_t”转换到�
 E:\TWTN\TWTN\imp.cpp(2416,40): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
 E:\TWTN\TWTN\imp.cpp(2486,16): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
 E:\TWTN\TWTN\imp.cpp(2487,16): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
-E:\TWTN\TWTN\imp.cpp(2535,95): error C2440: “类型强制转换”: 无法从“_InIt”转换为“int”
-          with
-          [
-              _InIt=std::_Vector_iterator<std::_Vector_val<std::_Simple_types<int>>>
-          ]
-E:\TWTN\TWTN\imp.cpp(2535,18): message : 没有可用于执行该转换的用户定义的转换运算符，或者无法调用该运算符
+E:\TWTN\TWTN\imp.cpp(2535,16): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
 E:\TWTN\TWTN\imp.cpp(2536,16): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(2625,89): error C3538: 在声明符列表中，“auto”必须始终推导为同一类型
+E:\TWTN\TWTN\imp.cpp(2625,89): message : 可能是“std::vector<int,std::allocator<int>>”
+E:\TWTN\TWTN\imp.cpp(2625,89): message : 或    “std::vector<bool,std::allocator<bool>>”
