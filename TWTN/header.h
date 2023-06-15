@@ -82,3 +82,9 @@ void read_inis(vector<vector<vector<int>>>& ini_solutions, vector<pair<ld, ld>>&
 void check_simi(vector<vector<vector<int>>>& ini_solutions);
 
 void inis_crossover(int index, vector<vector<vector<int>>>& ini_solutions, vector<pair<ld, ld>>& ini_solution_delays, vector<pair<ld, ld>>& ini_solution_vars, vector<ld>& ini_delays, vector<vector<ld>>& means, vector<vector<ld>>& vars);
+
+void build_path(vector<vector<int>>& childs, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<vector<int>>& solution, vector<ld>& ini_delays, vector<vector<int>>& origins, ld var_limit, vector<ld>& shortest_var);
+
+void sort_edges(bool posi, vector<vector<int>>& childs, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<pair<int, int>>& sorted_edges);
+
+void select_edges(ld& delay, ld& var, ld threshold, vector<pair<int, int>>& partial_paths, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<pair<int, int>>& sorted_edges, vector<bool>& is_in_path, vector<int>& out_going, vector<int>& in_coming);

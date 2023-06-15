@@ -47,7 +47,7 @@ void read_origin(vector<vector<int>>& origins)
 		int pos = 0, nextpos = -1;
 		while ((nextpos = linestr.find(" ", pos)) != -1)
 		{
-			int node = stoi(linestr.substr(pos, nextpos - pos));
+			int node = stoi(linestr.substr(pos, (unsigned)nextpos - pos));
 			pos = nextpos + 1;
 			origins[i].emplace_back(node);
 		}
@@ -2599,4 +2599,131 @@ void inis_crossover(int index, vector<vector<vector<int>>>& ini_solutions, vecto
 	}
 	cout << new_var << endl;
 	cout << "hops: " << ship_0_path.size() << endl;
+}
+
+void build_path(vector<vector<int>>& childs, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<vector<int>>& solution, vector<ld>& ini_delays, vector<vector<int>>& origins, ld var_limit, vector<ld>& shortest_var)
+{
+	vector<pair<int, int>> sorted_edges;
+
+
+
+	sort_edges(true, childs, means, vars, sorted_edges);
+
+	vector<bool> is_in_path(10001, false);
+	vector<int> out_going(10001, 0), in_coming(10001, 0);
+
+	ld delay = ini_delays[0];
+	ld var = 0;
+
+	vector<pair<int, int>> partial_paths;
+	select_edges(delay, var, -0.6, partial_paths, means, vars, sorted_edges, is_in_path, out_going, in_coming);
+
+	for (auto origin : origins[0])
+	{
+		
+	}
+}
+
+
+
+
+void sort_edges(bool posi, vector<vector<int>>& childs, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<pair<int, int>>& sorted_edges)
+{
+	sorted_edges.reserve(1000000);
+	for (int node = 1; node <= 10000; ++node)
+	{
+		if (node == 105)
+			continue;
+
+		for (auto child : childs[node])
+		{
+			if (posi && means[node][child] < 0 || !posi && means[node][child] > 0)
+				continue;
+			sorted_edges.emplace_back(node, child);
+		}
+	}
+	if(posi)
+		sort(sorted_edges.begin(), sorted_edges.end(), [&](const pair<int, int>& pa, const pair<int, int>& pb) { return means[pa.first][pa.second]/vars[pa.first][pa.second] > means[pb.first][pb.second]/vars[pb.first][pb.second]; });
+	else
+		sort(sorted_edges.begin(), sorted_edges.end(), [&](const pair<int, int>& pa, const pair<int, int>& pb) { return means[pa.first][pa.second]/vars[pa.first][pa.second] < means[pb.first][pb.second]/vars[pb.first][pb.second]; });
+}
+
+
+void select_edges(ld& delay, ld& var, ld threshold, vector<pair<int, int>>& partial_paths, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<pair<int, int>>& sorted_edges, vector<bool>& is_in_path, vector<int>& out_going, vector<int>& in_coming)
+{
+	int pos = 0;
+	int cnt = 0;
+	vector<pair<int, int>> selected_edges;
+	while (threshold > 0 && delay > threshold || threshold < 0 && delay < threshold)
+	{
+		if (pos >= sorted_edges.size())
+			break;
+
+		int node = sorted_edges[pos].first, child = sorted_edges[pos].second;
+		if (out_going[node] == 0 && in_coming[child] == 0)
+		{
+			if (out_going[child] > 0)
+			{
+				int check_node = child;
+				bool loop = false;
+				//检查是否会构成环
+				while (check_node != 0)
+				{
+					check_node = out_going[check_node];
+					if (check_node == node)
+					{
+						loop = true;
+						break;
+					}
+				}
+				if (loop)
+				{
+					++pos;
+					continue;
+				}
+			}
+
+			selected_edges.emplace_back(sorted_edges[pos]);
+			out_going[node] = child;
+			in_coming[child] = node;
+
+			is_in_path[node] = true;
+			is_in_path[child] = true;
+			++cnt;
+			delay += means[node][child];
+			var += vars[node][child];
+		}
+
+
+		++pos;
+	}
+	//cout << pos << endl;
+	cout << cnt << endl;
+	//cout << var << endl;
+	vector<bool> checked(10001, false);
+
+	for (int node = 1; node <= 10000; ++node)
+	{
+		if (checked[node] || in_coming[node] != 0)
+			continue;
+
+		if (out_going[node] != 0)
+		{
+			int check_node = out_going[node];
+			checked[node] = true;
+			int tail = node;
+			int len = 1;
+			while (check_node != 0)
+			{
+				checked[check_node] = true;
+				tail = check_node;
+				++len;
+				check_node = out_going[check_node];
+			}
+			//cout << "len: " << len << endl;
+
+			partial_paths.emplace_back(node, tail);
+		}
+		
+	}
 }
