@@ -6,20 +6,24 @@ E:\TWTN\TWTN\imp.cpp(70,30): warning C4267: “初始化”: 从“size_t”转�
 E:\TWTN\TWTN\imp.cpp(104,31): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
 E:\TWTN\TWTN\imp.cpp(106,33): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
 E:\TWTN\TWTN\imp.cpp(488,34): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-E:\TWTN\TWTN\imp.cpp(1153,134): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-E:\TWTN\TWTN\imp.cpp(1197,140): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-E:\TWTN\TWTN\imp.cpp(1776,39): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-E:\TWTN\TWTN\imp.cpp(1776,73): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-E:\TWTN\TWTN\imp.cpp(1780,43): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-E:\TWTN\TWTN\imp.cpp(1790,40): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-E:\TWTN\TWTN\imp.cpp(1797,37): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
-E:\TWTN\TWTN\imp.cpp(1804,37): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
-E:\TWTN\TWTN\imp.cpp(1811,37): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
-E:\TWTN\TWTN\imp.cpp(2416,40): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(1152,134): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(1196,140): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(1775,39): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(1775,73): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(1779,43): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(1789,40): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(1796,37): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(1803,37): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(1810,37): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(2415,40): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(2485,16): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
 E:\TWTN\TWTN\imp.cpp(2486,16): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
-E:\TWTN\TWTN\imp.cpp(2487,16): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(2534,16): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
 E:\TWTN\TWTN\imp.cpp(2535,16): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
-E:\TWTN\TWTN\imp.cpp(2536,16): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
-E:\TWTN\TWTN\imp.cpp(2625,89): error C3538: 在声明符列表中，“auto”必须始终推导为同一类型
-E:\TWTN\TWTN\imp.cpp(2625,89): message : 可能是“std::vector<int,std::allocator<int>>”
-E:\TWTN\TWTN\imp.cpp(2625,89): message : 或    “std::vector<bool,std::allocator<bool>>”
+  main.cpp
+  正在生成代码
+  157 of 762 functions (20.6%) were compiled, the rest were copied from previous compilation.
+    1 functions were new in current compilation
+    89 functions had inline decision re-evaluated but remain unchanged
+  已完成代码的生成
+  TWTN.vcxproj -> E:\TWTN\x64\Release\TWTN.exe

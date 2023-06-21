@@ -59,6 +59,13 @@ int main(int argc, char* argv[])
 	//inis_crossover(0, ini_solutions, ini_solution_delays, ini_solution_vars, ini_delays, means, vars);
 	//check_simi(ini_solutions);
 	//cout << (INT_MIN >> 1) << endl;
+	auto start = system_clock::now();
 	build_path(childs, means, vars, solution, ini_delays, origins, 0.03, shortest_var);
+	auto end = system_clock::now();
+	auto duration = duration_cast<seconds>(end - start);
+	//write_solution(solution, "..\\data\\buid_path-ship11-0.6.txt", duration);
+	/*read_ini_solution(solution, visited, ini_delays, means);
+	cout << "read fin" << endl;
+	check_solution(solution, visited, means, vars, ini_delays);*/
 	return 0;
 }

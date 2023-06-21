@@ -87,4 +87,10 @@ void build_path(vector<vector<int>>& childs, vector<vector<ld>>& means, vector<v
 
 void sort_edges(bool posi, vector<vector<int>>& childs, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<pair<int, int>>& sorted_edges);
 
-void select_edges(ld& delay, ld& var, ld threshold, vector<pair<int, int>>& partial_paths, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<pair<int, int>>& sorted_edges, vector<bool>& is_in_path, vector<int>& out_going, vector<int>& in_coming);
+void select_edges(ld& delay_0, ld& var_0, ld& delay_11, ld& var_11, ld threshold_0, ld threshold_11, vector<pair<int, int>>& partial_paths_s0, vector<pair<int, int>>& partial_paths_s11, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<pair<int, int>>& sorted_edges_posi, vector<pair<int, int>>& sorted_edges_nege, vector<int>& is_in_path, vector<int>& out_going, vector<int>& in_coming);
+
+void connect_nodes(int ship, int start, int destination, vector<vector<int>>& childs, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<bool>& is_in_path, int hops_limit, vector<int>& res_path, ld& res_var, ld& res_mean);
+
+void dfs_connect(int ship, int destination, vector<vector<int>>& childs, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<int>& is_in_path, vector<int>& path, ld current_delay, int node, ld current_var, vector<int>& best_path, ld& best_var, ld& best_mean, int hops, int hops_limit);
+
+void bfs_connect(int ship, int start, int destination, vector<vector<int>>& childs, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<int>& is_in_path, vector<int>& path);
