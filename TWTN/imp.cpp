@@ -741,7 +741,7 @@ void write_solution(vector<vector<int>>& solution, string filename, chrono::seco
 
 	//ofstream outfile(filepath + name);
 	ofstream outfile(filename);
-	for (int ship = 0; ship < 12; ship += 12)
+	for (int ship = 0; ship < 12; ship += 11)
 	{
 		vector<int>& route = solution[ship];
 
@@ -2712,7 +2712,7 @@ void build_path(vector<vector<int>>& childs, vector<vector<ld>>& means, vector<v
 			best_start_mean = res_mean;
 		}
 	}
-	int start_des = best_start_path.back();
+	start_des = best_start_path.back();
 	for (int i = 0; i < rec_partial_paths_s11.size(); ++i)
 	{
 		if (rec_partial_paths_s11[i].first == start_des)
@@ -2738,26 +2738,26 @@ void build_path(vector<vector<int>>& childs, vector<vector<ld>>& means, vector<v
 	var_11 += best_start_var;
 
 	//todo
-	//再来连接尾部105
+	//再来连接 ship0 尾部105
 	auto is_in_path = rec_is_in_path;
 	ld res_var = 10, res_mean = 0;
 	vector<int> res_path;
-	for (int i = 1; i<rec_partial_paths.size(); ++i)
+	for (int i = 1; i<rec_partial_paths_s0.size(); ++i)
 	{
 		//cout << "to find " << origin << "  to  " << p_p.first << endl;
-		auto& p_p = rec_partial_paths[i];
-		connect_nodes(p_p.second, 105, childs, means, vars, is_in_path, 5, res_path, res_var, res_mean);
+		auto& p_p = rec_partial_paths_s0[i];
+		connect_nodes(0, p_p.second, 105, childs, means, vars, is_in_path, 5, res_path, res_var, res_mean);
 	}
 
 	int start = res_path[0];
-	for (int i = 1; i < rec_partial_paths.size(); ++i)
+	for (int i = 1; i < rec_partial_paths_s0.size(); ++i)
 	{
-		if (rec_partial_paths[i].second == start)
+		if (rec_partial_paths_s0[i].second == start)
 		{
-			rec_partial_paths[i].second = 105;
-			if (i != rec_partial_paths.size() - 1)
+			rec_partial_paths_s0[i].second = 105;
+			if (i != rec_partial_paths_s0.size() - 1)
 			{
-				swap(rec_partial_paths[i], rec_partial_paths[rec_partial_paths.size() - 1]);
+				swap(rec_partial_paths_s0[i], rec_partial_paths_s0[rec_partial_paths_s0.size() - 1]);
 			}
 			break;
 		}
@@ -2768,66 +2768,176 @@ void build_path(vector<vector<int>>& childs, vector<vector<ld>>& means, vector<v
 		int node = res_path[i], prenode = res_path[i - 1];
 		rec_in_coming[node] = prenode;
 		rec_out_going[prenode] = node;
-		rec_is_in_path[node] = true;
+		rec_is_in_path[node] = 0;
 	}
 
-	delay += res_mean;
-	var += res_var;
+	delay_0 += res_mean;
+	var_0 += res_var;
 
-	//cout << "after var  " << var << "  mean:  " << delay << endl;
-	while (rec_partial_paths.size() > 2)
+
+	//ship 11尾部
+	is_in_path = rec_is_in_path;
+	res_var = 10, res_mean = 0;
+	res_path.clear();
+	for (int i = 1; i < rec_partial_paths_s11.size(); ++i)
+	{
+		//cout << "to find " << origin << "  to  " << p_p.first << endl;
+		auto& p_p = rec_partial_paths_s11[i];
+		connect_nodes(11, p_p.second, 105, childs, means, vars, is_in_path, 5, res_path, res_var, res_mean);
+	}
+
+	start = res_path[0];
+	for (int i = 1; i < rec_partial_paths_s11.size(); ++i)
+	{
+		if (rec_partial_paths_s11[i].second == start)
+		{
+			rec_partial_paths_s11[i].second = 105;
+			if (i != rec_partial_paths_s11.size() - 1)
+			{
+				swap(rec_partial_paths_s11[i], rec_partial_paths_s11[rec_partial_paths_s11.size() - 1]);
+			}
+			break;
+		}
+	}
+	//修改拓扑
+	for (int i = 1; i < res_path.size(); ++i)
+	{
+		int node = res_path[i], prenode = res_path[i - 1];
+		rec_in_coming[node] = prenode;
+		rec_out_going[prenode] = node;
+		rec_is_in_path[node] = 11;
+	}
+	delay_11 += res_mean;
+	var_11 += res_var;
+	/*cout << "after 0 var  " << var_0 << "  mean:  " << delay_0 << endl;
+	cout << "after 11 var  " << var_11 << "  mean:  " << delay_11 << endl;*/
+
+	while (rec_partial_paths_s0.size() > 2 || rec_partial_paths_s11.size() > 2)
 	{
 		//每次选两条，头尾相连
-		int pre_index = -1, next_index = -1;
-		ld best_var = 10, best_delay = 0;
-		ld rec_var = 10;
-		vector<int> best_path;
-
-		for (int pre = 0; pre < rec_partial_paths.size() - 1; ++pre)
+		//todo
+		bool flag = false;
+		if (rec_partial_paths_s0.size() > 2)
 		{
-			for (int next = 1; next < rec_partial_paths.size(); ++next)
+			int pre_index = -1, next_index = -1;
+			ld best_var = 10, best_delay = 0;
+			ld rec_var = 10;
+			vector<int> best_path;
+
+			for (int pre = 0; pre < rec_partial_paths_s0.size() - 1; ++pre)
 			{
-				if (pre == 0 && next == rec_partial_paths.size() - 1 || pre == next)
-					continue;
-				vector<bool> is_in_path = rec_is_in_path;
-				connect_nodes(rec_partial_paths[pre].second, rec_partial_paths[next].first, childs, means, vars, is_in_path, 5, best_path, best_var, best_delay);
-				if (rec_var > best_var)
+				for (int next = 1; next < rec_partial_paths_s0.size(); ++next)
 				{
-					rec_var = best_var;
-					pre_index = pre;
-					next_index = next;
+					if (pre == 0 && next == rec_partial_paths_s0.size() - 1 || pre == next)
+						continue;
+					vector<int> is_in_path = rec_is_in_path;
+					connect_nodes(0, rec_partial_paths_s0[pre].second, rec_partial_paths_s0[next].first, childs, means, vars, is_in_path, 5, best_path, best_var, best_delay);
+					if (rec_var > best_var)
+					{
+						rec_var = best_var;
+						pre_index = pre;
+						next_index = next;
+					}
 				}
+			}
+
+			if (best_path.size() == 0)
+			{
+				cout << "no connection" << endl;
+
+			}
+			else
+				flag = true;
+
+			if (best_path.size() > 0)
+			{
+				rec_partial_paths_s0[pre_index].second = rec_partial_paths_s0[next_index].second;
+				//先改拓扑
+				for (int i = 1; i < best_path.size(); ++i)
+				{
+					int node = best_path[i], prenode = best_path[i - 1];
+					rec_in_coming[node] = prenode;
+					rec_out_going[prenode] = node;
+					rec_is_in_path[node] = 0;
+				}
+
+				if (rec_partial_paths_s0[next_index].second == 105)
+				{
+					swap(rec_partial_paths_s0[pre_index], rec_partial_paths_s0[next_index]);
+					swap(pre_index, next_index);
+				}
+
+				rec_partial_paths_s0.erase(rec_partial_paths_s0.begin() + next_index);
+				//cout << "increase var: " << best_var << endl;
+
+				var_0 += best_var;
+				delay_0 += best_delay;
+				//cout << "current var: " << var << endl;
 			}
 		}
 
-		if (best_path.size() == 0)
+
+		if (rec_partial_paths_s11.size() > 2)
 		{
-			cout << "no connection" << endl;
+			int pre_index = -1, next_index = -1;
+			ld best_var = 10, best_delay = 0;
+			ld rec_var = 10;
+			vector<int> best_path;
+
+			for (int pre = 0; pre < rec_partial_paths_s11.size() - 1; ++pre)
+			{
+				for (int next = 1; next < rec_partial_paths_s11.size(); ++next)
+				{
+					if (pre == 0 && next == rec_partial_paths_s11.size() - 1 || pre == next)
+						continue;
+					vector<int> is_in_path = rec_is_in_path;
+					connect_nodes(11, rec_partial_paths_s11[pre].second, rec_partial_paths_s11[next].first, childs, means, vars, is_in_path, 5, best_path, best_var, best_delay);
+					if (rec_var > best_var)
+					{
+						rec_var = best_var;
+						pre_index = pre;
+						next_index = next;
+					}
+				}
+			}
+
+			if (best_path.size() == 0)
+			{
+				cout << "no connection" << endl;
+
+			}
+			else
+				flag = true;
+
+			if (best_path.size() > 0)
+			{
+				rec_partial_paths_s11[pre_index].second = rec_partial_paths_s11[next_index].second;
+				//先改拓扑
+				for (int i = 1; i < best_path.size(); ++i)
+				{
+					int node = best_path[i], prenode = best_path[i - 1];
+					rec_in_coming[node] = prenode;
+					rec_out_going[prenode] = node;
+					rec_is_in_path[node] = 11;
+				}
+
+				if (rec_partial_paths_s11[next_index].second == 105)
+				{
+					swap(rec_partial_paths_s11[pre_index], rec_partial_paths_s11[next_index]);
+					swap(pre_index, next_index);
+				}
+
+				rec_partial_paths_s11.erase(rec_partial_paths_s11.begin() + next_index);
+				//cout << "increase var: " << best_var << endl;
+
+				var_11 += best_var;
+				delay_11 += best_delay;
+				//cout << "current var: " << var << endl;
+			}
+		}
+
+		if (!flag)
 			break;
-		}
-
-		rec_partial_paths[pre_index].second = rec_partial_paths[next_index].second;
-		//先改拓扑
-		for (int i = 1; i < best_path.size(); ++i)
-		{
-			int node = best_path[i], prenode = best_path[i - 1];
-			rec_in_coming[node] = prenode;
-			rec_out_going[prenode] = node;
-			rec_is_in_path[node] = true;
-		}
-
-		if (rec_partial_paths[next_index].second == 105)
-		{
-			swap(rec_partial_paths[pre_index], rec_partial_paths[next_index]);
-			swap(pre_index, next_index);
-		}
-
-		rec_partial_paths.erase(rec_partial_paths.begin() + next_index);
-		//cout << "increase var: " << best_var << endl;
-
-		var += best_var;
-		delay += best_delay;
-		//cout << "current var: " << var << endl;
 	}
 
 	//最后把头尾两个partial_path相连
@@ -2836,36 +2946,73 @@ void build_path(vector<vector<int>>& childs, vector<vector<ld>>& means, vector<v
 	res_path.clear();
 
 
-	connect_nodes(rec_partial_paths[0].second, rec_partial_paths[1].first, childs, means, vars, is_in_path, 5, res_path, res_var, res_mean);
-	rec_partial_paths[0].second = 105;
+	connect_nodes(0, rec_partial_paths_s0[0].second, rec_partial_paths_s0[1].first, childs, means, vars, is_in_path, 5, res_path, res_var, res_mean);
+	rec_partial_paths_s0[0].second = 105;
 
 	for (int i = 1; i < res_path.size(); ++i)
 	{
 		int node = res_path[i], prenode = res_path[i - 1];
 		rec_in_coming[node] = prenode;
 		rec_out_going[prenode] = node;
-		rec_is_in_path[node] = true;
+		rec_is_in_path[node] = 0;
 	}
-	var += res_var;
-	delay += res_mean;
+	var_0 += res_var;
+	delay_0 += res_mean;
 
 
 
 
+	cout << "ship 0" << endl;
+	cout << "final var: " << var_0 << endl;
+	cout << "final delay: " << delay_0 << endl;
 
-	cout << "final var: " << var << endl;
-	cout << "final delay: " << delay << endl;
+	solution[0].clear();
+	
+	int node = rec_partial_paths_s0[0].first;
+	while (node != rec_partial_paths_s0[0].second)
+	{
+		solution[0].emplace_back(node);
+		node = rec_out_going[node];
+	}
+	solution[0].emplace_back(node);
+
+
+
+	//ship11
+	is_in_path = rec_is_in_path;
+	res_var = 10, res_mean = 0;
+	res_path.clear();
+
+
+	connect_nodes(11, rec_partial_paths_s11[0].second, rec_partial_paths_s11[1].first, childs, means, vars, is_in_path, 5, res_path, res_var, res_mean);
+	rec_partial_paths_s11[0].second = 105;
+
+	for (int i = 1; i < res_path.size(); ++i)
+	{
+		int node = res_path[i], prenode = res_path[i - 1];
+		rec_in_coming[node] = prenode;
+		rec_out_going[prenode] = node;
+		rec_is_in_path[node] = 11;
+	}
+	var_11 += res_var;
+	delay_11 += res_mean;
+
+
+
+
+	cout << "ship 11" << endl;
+	cout << "final var: " << var_11 << endl;
+	cout << "final delay: " << delay_11 << endl;
 
 	solution[11].clear();
-	
-	int node = rec_partial_paths[0].first;
-	while (node != rec_partial_paths[0].second)
+
+	node = rec_partial_paths_s11[0].first;
+	while (node != rec_partial_paths_s11[0].second)
 	{
 		solution[11].emplace_back(node);
 		node = rec_out_going[node];
 	}
 	solution[11].emplace_back(node);
-
 }
 
 
@@ -3027,7 +3174,7 @@ void select_edges(ld& delay_0, ld& var_0, ld& delay_11, ld& var_11, ld threshold
 	cout << "delay " << delay_11 << "  var " << var_11 << endl;
 }
 
-void connect_nodes(int ship, int start, int destination, vector<vector<int>>& childs, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<bool>& is_in_path, int hops_limit, vector<int>& res_path, ld& res_var, ld& res_mean)
+void connect_nodes(int ship, int start, int destination, vector<vector<int>>& childs, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<int>& is_in_path, int hops_limit, vector<int>& res_path, ld& res_var, ld& res_mean)
 {
 	vector<int> now_in_path = is_in_path;
 
@@ -3093,7 +3240,7 @@ void dfs_connect(int ship, int destination, vector<vector<int>>& childs, vector<
 	{
 		path.emplace_back(105);
 		is_in_path[105] = ship;
-		dfs_connect(destination, childs, means, vars, is_in_path, path, current_delay + means[node][105], 105, current_var + vars[node][105], best_path, best_var, best_mean, hops + 1, hops_limit);
+		dfs_connect(ship, destination, childs, means, vars, is_in_path, path, current_delay + means[node][105], 105, current_var + vars[node][105], best_path, best_var, best_mean, hops + 1, hops_limit);
 		path.erase(path.end() - 1);
 		is_in_path[105] = -1;
 
@@ -3110,7 +3257,7 @@ void dfs_connect(int ship, int destination, vector<vector<int>>& childs, vector<
 
 		path.emplace_back(child);
 		is_in_path[child] = ship;
-		dfs_connect(destination, childs, means, vars, is_in_path, path, current_delay + means[node][child], child, current_var + vars[node][child], best_path, best_var, best_mean, hops + 1, hops_limit);
+		dfs_connect(ship, destination, childs, means, vars, is_in_path, path, current_delay + means[node][child], child, current_var + vars[node][child], best_path, best_var, best_mean, hops + 1, hops_limit);
 		path.erase(path.end() - 1);
 		is_in_path[child] = -1;
 		++cnt;

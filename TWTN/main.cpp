@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
 	build_path(childs, means, vars, solution, ini_delays, origins, 0.03, shortest_var);
 	auto end = system_clock::now();
 	auto duration = duration_cast<seconds>(end - start);
-	//write_solution(solution, "..\\data\\buid_path-ship11-0.6.txt", duration);
+	write_solution(solution, "..\\data\\build_path-0.6.txt", duration);
 	/*read_ini_solution(solution, visited, ini_delays, means);
 	cout << "read fin" << endl;
 	check_solution(solution, visited, means, vars, ini_delays);*/
