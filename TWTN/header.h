@@ -27,7 +27,7 @@ void find_path(vector<vector<int>>& childs, int origin, vector<vector<ld>>& mean
 
 bool is_in_time_window(ld time);
 
-void read_ini_solution(vector<vector<int>>& solution, vector<vector<ld>>& visited, vector<ld>& ini_delays, vector<vector<ld>>& means);
+void read_ini_solution(vector<vector<int>>& solution, vector<bool>& is_visited, vector<ld>& ini_delays, vector<vector<ld>>& means);
 
 void read_0_11_path(vector<vector<int>>& solution, vector<vector<ld>>& visited, vector<ld>& ini_delays, vector<vector<ld>>& means, string filename);
 
@@ -39,9 +39,9 @@ ld cal_path_var(vector<int>& path, vector<vector<ld>>& visited, vector<vector<ld
 void gene_solution(int ship, vector<vector<int>>& childs, vector<vector<int>>& solution, vector<vector<ld>>& visited, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<ld>& shortest_mean, vector<ld>& shortest_var, vector<ld>& ini_delays, vector<vector<int>>& shortest_path, vector<vector<int>>& origins, vector<vector<bool>>& dominated);
 
 
-void check_solution(vector<vector<int>>& solution, vector<vector<ld>>& visited, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<ld>& ini_delays);
+void check_solution(vector<vector<int>>& solution, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<ld>& ini_delays);
 
-void write_solution(vector<vector<int>>& solution, string filename, chrono::seconds& duration);
+void write_solution(vector<vector<int>>& solution, string filename);
 
 void delete_ship_path(int ship, vector<vector<int>>& solution, vector<vector<ld>>& visited, vector<vector<ld>>& means, vector<ld>& ini_delays);
 
@@ -94,3 +94,9 @@ void connect_nodes(int ship, int start, int destination, vector<vector<int>>& ch
 void dfs_connect(int ship, int destination, vector<vector<int>>& childs, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<int>& is_in_path, vector<int>& path, ld current_delay, int node, ld current_var, vector<int>& best_path, ld& best_var, ld& best_mean, int hops, int hops_limit);
 
 void bfs_connect(int ship, int start, int destination, vector<vector<int>>& childs, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<int>& is_in_path, vector<int>& path);
+
+void modify(vector<vector<int>>& solution, vector<vector<int>>& childs, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<ld>& ini_delays, vector<bool>& is_visited);
+
+void search_partial(int node, int destination, vector<vector<int>>& childs, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<bool>& is_visited, vector<int>& path, ld current_delay, ld current_var, ld old_mean, vector<int>& best_path, ld& best_var, ld& best_mean, int hops, int hops_limit);
+
+void re_build_11_path(vector<vector<int>>& solution, vector<vector<int>>& childs, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<ld>& ini_delays, vector<bool>& is_visited, vector<vector<int>>& origins);

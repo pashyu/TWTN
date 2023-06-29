@@ -5,7 +5,7 @@
 #include<iomanip>
 #include<iostream>
 #include<filesystem>
-
+#include<random>
 void read_edge_and_meanvar(vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<vector<int>>& neighbors)
 {
 	ld mean, var;
@@ -218,30 +218,28 @@ bool is_in_time_window(ld time)
 }
 
 
-void read_ini_solution(vector<vector<int>>& solution, vector<vector<ld>>& visited, vector<ld>& ini_delays, vector<vector<ld>>& means)
+void read_ini_solution(vector<vector<int>>& solution, vector<bool>& is_visited, vector<ld>& ini_delays, vector<vector<ld>>& means)
 {
-	ifstream infile("../data/build_path-ship0.txt");
-	for (int i = 0; i < 12; i+=12)
+	ifstream infile("../data/unfeasible/273.69.txt");
+	for (int i = 0; i < 12; ++i)
 	{
 		int node = 0;
 		ld delay = ini_delays[i];
 		infile >> node;
-		//if (i == 0 || i == 11)
-		//{
-			visited[node].emplace_back(delay);
-			solution[i].emplace_back(node);
-		//}
+	
+		is_visited[node] = true;
+		solution[i].emplace_back(node);
+		
 		int prenode = node;
 		while (node != 105)
 		{
 			infile >> node;
 
 			delay += means[prenode][node];
-			//if (i == 0 || i == 11)
-			//{
-				visited[node].emplace_back(delay);
-				solution[i].emplace_back(node);
-			//}
+			
+			is_visited[node] = true;
+			solution[i].emplace_back(node);
+			
 			prenode = node;
 		}
 	}
@@ -684,11 +682,11 @@ void gene_solution(int ship, vector<vector<int>>& childs, vector<vector<int>>& s
 }
 
 
-void check_solution(vector<vector<int>>& solution, vector<vector<ld>>& visited, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<ld>& ini_delays)
+void check_solution(vector<vector<int>>& solution, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<ld>& ini_delays)
 {
 	//看一下每个ship有多少个点是重复的，重新计算一次var
 	int repeat_cnt = 0;
-	for (int ship = 0; ship < 12; ship += 12)
+	for (int ship = 0; ship < 12; ++ship)
 	{
 		ld current_delay = ini_delays[ship];
 		ld total_var = 0;
@@ -699,18 +697,9 @@ void check_solution(vector<vector<int>>& solution, vector<vector<ld>>& visited, 
 		int cnt = 0;
 		while (node != 105)
 		{
-			int k = 0;
-			for (auto visit_time : visited[node])
-			{
-				if (visit_time < current_delay)
-					++k;
-			}
-			if (visited[node].size() == 1)
-				k = 0;
+			
 			if (vars[node][route[j]] > 3e-4)
 				++cnt;
-			if (visited[node].size() > 1 && ship == 0)
-				++repeat_cnt;
 			
 			//total_var += vars[node][route[j]] * pow(10, k);
 			total_var += vars[node][route[j]];
@@ -726,11 +715,11 @@ void check_solution(vector<vector<int>>& solution, vector<vector<ld>>& visited, 
 		cout << "ship " << ship << " final var: " << total_var << "  arrive time: " << current_delay << "  ave var: " << total_var / j << "  big var: " << big_var << " hops: " << j << endl;
 	}
 
-	cout << "total repeat: " << repeat_cnt << endl;
+	//cout << "total repeat: " << repeat_cnt << endl;
 }
 
 
-void write_solution(vector<vector<int>>& solution, string filename, chrono::seconds& duration)
+void write_solution(vector<vector<int>>& solution, string filename)
 {
 	string filepath, name;
 
@@ -741,7 +730,7 @@ void write_solution(vector<vector<int>>& solution, string filename, chrono::seco
 
 	//ofstream outfile(filepath + name);
 	ofstream outfile(filename);
-	for (int ship = 0; ship < 12; ship += 11)
+	for (int ship = 0; ship < 12; ship ++)
 	{
 		vector<int>& route = solution[ship];
 
@@ -761,7 +750,7 @@ void write_solution(vector<vector<int>>& solution, string filename, chrono::seco
 			++cnt;
 		}*/
 	}
-	outfile << "seconds: " << duration.count() << endl;
+	
 	outfile.close();
 }
 
@@ -1766,52 +1755,37 @@ void transfer_file(string filename)
 	ifstream infile(filename);
 
 
-
+	if (infile.good())
+		cout << "good" << endl;
 
 	string linestr;
-	getline(infile, linestr);
-	getline(infile, linestr);
 
-	int pos1 = linestr.find_first_of('['), pos2 = linestr.find_last_of(']');
+	//getline(infile, linestr);
 
-	++pos1;
+	
+
+
 	string filepath, name;
 	int pathpos = filename.find_last_of('\\');
 	filepath = filename.substr(0, pathpos + 1);
 	name = filename.substr(pathpos + 1);
 
-	filepath += "ini-solutions\\";
 
-	ofstream outfile(filepath + name);
 
-	while (pos1 < pos2)
+	ofstream outfile(filepath + "new-" +name);
+	int ship = 0;
+	while (ship < 12)
 	{
-		int gam_pos = linestr.find(',', pos1);
-		int node = stoi(linestr.substr(pos1, gam_pos - pos1));
+		getline(infile, linestr);
 
-		while (node != 0)
+		for (auto& c : linestr)
 		{
-			outfile << node << ' ';
-			pos1 = gam_pos + 1;
-			gam_pos = linestr.find(',', pos1);
-			node = stoi(linestr.substr(pos1, gam_pos - pos1));
+			if (c == ',')
+				c = ' ';
 		}
-		outfile << 105 << endl;
-		while (node == 0)
-		{
-			pos1 = gam_pos + 1;
-			gam_pos = linestr.find(',', pos1);
-			node = stoi(linestr.substr(pos1, gam_pos - pos1));
-		}
-		while (node != 0)
-		{
-			outfile << node << ' ';
-			pos1 = gam_pos + 1;
-			gam_pos = linestr.find(',', pos1);
-			node = stoi(linestr.substr(pos1, gam_pos - pos1));
-		}
-		outfile << 105 << endl;
-		break;
+		
+		++ship;
+		outfile << linestr << endl;
 	}
 
 
@@ -3317,5 +3291,343 @@ void bfs_connect(int ship, int start, int destination, vector<vector<int>>& chil
 	
 
 	return;
+
+}
+
+void modify(vector<vector<int>>& solution, vector<vector<int>>& childs, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<ld>& ini_delays, vector<bool>& is_visited)
+{
+	//273.941最大在ship11,  237.884最大在ship0
+	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+	std::default_random_engine generator(seed);
+	int turns = 20;
+	int max_gap = 10;
+	//for 273.941
+	ld modi_value = 0;
+	int length = solution[11].size();
+	std::uniform_int_distribution<int> distribution(1, length - 2);
+	for (int turn = 0; turn < turns; ++turn)
+	{
+		//cout << "a turn" << endl;
+		//如果var变小了,break
+		int pos1 = distribution(generator);
+		ld old_var = vars[solution[11][pos1]][solution[11][pos1 + 1]];
+		ld old_mean = means[solution[11][pos1]][solution[11][pos1 + 1]];
+		bool improved = false;
+
+		for (int gap = 1; gap <= max_gap; ++gap)
+		{
+			int pos2 = pos1 + gap + 1;
+
+			if (pos2 >= length)
+				break;
+
+			old_var += vars[solution[11][pos2 - 1]][solution[11][pos2]];
+			old_mean += means[solution[11][pos2 - 1]][solution[11][pos2]];
+			//重新规划pos1到pos2的
+			vector<bool> search_visited = is_visited;
+			
+			for (int pos = pos1 + 1; pos < pos2; ++pos)
+			{
+				int node = solution[11][pos];
+				search_visited[node] = false;
+			}
+
+			ld new_var = old_var, new_delay = 0;
+			vector<int> partial_path;
+			vector<int> best_path;
+			partial_path.emplace_back(solution[11][pos1]);
+
+			//以solution[11][pos2]为destination
+
+			int destination = solution[11][pos2];
+
+			search_partial(solution[11][pos1], destination, childs, means, vars, search_visited, partial_path, 0, 0, old_mean, best_path, new_var, new_delay, 0, gap + 1);
+
+			if (best_path.size() > 0)
+			{
+				//替换
+				modi_value = old_mean - new_delay;
+				//solution[11]从pos1到pos2全删掉
+
+				for (int pos = pos1; pos <= pos2; ++pos)
+				{
+					int node = solution[11][pos];
+
+					is_visited[node] = false;
+				}
+				solution[11].erase(solution[11].begin() + pos1, solution[11].begin() + pos2 + 1);
+				solution[11].insert(solution[11].begin() + pos1, best_path.begin(), best_path.end());
+				for (auto node : best_path)
+				{
+					is_visited[node] = true;
+				}
+				improved = true;
+				break;
+			}
+			
+		}
+
+
+
+		if (improved && modi_value > 1.8e-3)
+			break;
+
+	}
+
+
+	//for 273.884
+	//int length = solution[0].size();
+	//std::uniform_int_distribution<int> distribution(1, length - 2);
+
+	//for (int turn = 0; turn < turns; ++turn)
+	//{
+	//	int pos1 = distribution(generator);
+	//	ld old_var = vars[solution[0][pos1]][solution[0][pos1 + 1]];
+	//	ld old_mean = means[solution[0][pos1]][solution[0][pos1 + 1]];
+	//	bool improved = false;
+
+	//	for (int gap = 1; gap <= max_gap; ++gap)
+	//	{
+	//		int pos2 = pos1 + gap + 1;
+
+	//		if (pos2 >= length)
+	//			break;
+
+	//		old_var += vars[solution[0][pos2 - 1]][solution[0][pos2]];
+	//		old_mean += means[solution[0][pos2 - 1]][solution[0][pos2]];
+	//		//重新规划pos1到pos2的
+	//		vector<bool> search_visited = is_visited;
+
+	//		for (int pos = pos1 + 1; pos < pos2; ++pos)
+	//		{
+	//			int node = solution[0][pos];
+	//			search_visited[node] = false;
+	//		}
+
+	//		ld new_var = old_var, new_delay = 0;
+	//		vector<int> partial_path;
+	//		vector<int> best_path;
+	//		partial_path.emplace_back(solution[0][pos1]);
+
+	//		//以solution[11][pos2]为destination
+
+	//		int destination = solution[0][pos2];
+
+	//		search_partial(solution[0][pos1], destination, childs, means, vars, search_visited, partial_path, 0, 0, old_mean, best_path, new_var, new_delay, 0, gap + 1);
+
+	//		if (best_path.size() > 0)
+	//		{
+	//			//替换
+
+	//			//solution[0]从pos1到pos2全删掉
+	//			solution[0].erase(solution[0].begin() + pos1, solution[0].begin() + pos2 + 1);
+	//			solution[0].insert(solution[0].begin() + pos1, best_path.begin(), best_path.end());
+
+	//			improved = true;
+	//			break;
+	//		}
+	//	}
+	//	if (improved)
+	//		break;
+	//}
+
+}
+
+void search_partial(int node, int destination, vector<vector<int>>& childs, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<bool>& is_visited, vector<int>& path, ld current_delay, ld current_var, ld old_mean, vector<int>& best_path, ld& best_var, ld& best_mean, int hops, int hops_limit)
+{
+	if (node == destination)
+	{
+		if (current_var < best_var + 2e-6 && current_delay < old_mean)
+		{
+			best_path = path;
+			best_var = current_var;
+			best_mean = current_delay;
+		}
+		return;
+	}
+	if (hops > hops_limit || current_var > best_var + 2e-6)
+	{
+		return;
+	}
+	
+	for (auto child : childs[node])
+	{
+
+		if (is_visited[child]  && child != destination)
+			continue;
+
+		path.emplace_back(child);
+		is_visited[child] = true;
+		search_partial(child, destination, childs, means, vars, is_visited, path, current_delay + means[node][child], current_var + vars[node][child], old_mean, best_path, best_var, best_mean, hops + 1, hops_limit);
+		path.erase(path.end() - 1);
+		is_visited[child] = false;
+
+	}
+
+
+}
+
+void re_build_11_path(vector<vector<int>>& solution, vector<vector<int>>& childs, vector<vector<ld>>& means, vector<vector<ld>>& vars, vector<ld>& ini_delays, vector<bool>& is_visited, vector<vector<int>>& origins)
+{
+	//挑选一些性价比高的，然后连起来
+	for (auto node : solution[11])
+	{
+		is_visited[node] = false;
+	}
+
+	solution[11].clear();
+	vector<pair<int, int>> sorted_edges;
+
+	sorted_edges.reserve(1000000);
+	for (int node = 1; node <= 10000; ++node)
+	{
+		if (node == 105 || is_visited[node])
+			continue;
+
+		for (auto child : childs[node])
+		{
+			if (means[node][child] > 0 || is_visited[child])
+				continue;
+			sorted_edges.emplace_back(node, child);
+		}
+	}
+	sort(sorted_edges.begin(), sorted_edges.end(), [&](const pair<int, int>& pa, const pair<int, int>& pb) { return means[pa.first][pa.second] / vars[pa.first][pa.second] < means[pb.first][pb.second] / vars[pb.first][pb.second]; });
+
+	ld ship_0_delay = ini_delays[0];
+	for (int pos = 1; pos < solution[0].size(); ++pos)
+	{
+		int prenode = solution[0][pos - 1], node = solution[0][pos];
+		ship_0_delay += means[prenode][node];
+	}
+
+	ld target_delay = 1 + ship_0_delay;
+
+	vector<int> rec_is_in_path(10001, -1);
+	for (int node = 1; node <= 10000; ++node)
+	{
+		if (is_visited[node])
+			rec_is_in_path[node] = 1;
+	}
+
+	//ship11要小于target_delay
+
+	ld ship_11_delay = ini_delays[11];
+
+	vector<int> rec_outgoing(10001, 0), rec_incoming(10001, 0);	
+	vector<pair<int, int>> rec_partial_paths;
+	ld ship_11_var = 0;
+	int pos = 0;
+	int hops = 0;
+	while (ship_11_delay > target_delay && pos < sorted_edges.size() && hops < 170)
+	{
+		int node = sorted_edges[pos].first, child = sorted_edges[pos].second;
+		if (rec_is_in_path[node] != 1 && rec_is_in_path[child] != 1 && rec_outgoing[node] == 0 && rec_incoming[child] == 0)
+		{
+			ship_11_delay += means[node][child];
+			rec_outgoing[node] = child;
+			rec_incoming[child] = node;
+			++hops;
+			ship_11_var += vars[node][child];
+			rec_partial_paths.emplace_back(pair<int, int>{node, child});
+			rec_is_in_path[node] = 11;
+			rec_is_in_path[child] = 11;
+		}
+		++pos;
+	}
+	cout << "ship11 delay: " << ship_11_delay <<"  "<<ship_11_delay - ship_0_delay << endl;
+	cout << "var: " << ship_11_var << endl;
+	cout << "hops: " << hops << endl;
+
+	
+
+	ld best_start_var = 10, best_start_mean = 0;
+	vector<int> best_start_path;
+	for (auto origin : origins[11])
+	{
+		auto partial_paths = rec_partial_paths;
+
+		auto out_going = rec_outgoing, in_coming = rec_incoming;
+		auto is_in_path = rec_is_in_path;
+
+		ld res_var = 10, res_mean = 0;
+		vector<int> res_path;
+		for (auto p_p : partial_paths)
+		{
+			//cout << "to find " << origin << "  to  " << p_p.first << endl;
+			connect_nodes(11, origin, p_p.first, childs, means, vars, is_in_path, 5, res_path, res_var, res_mean);
+		}
+		//cout << "res var: " << res_var << endl;
+		if (res_var < best_start_var)
+		{
+			best_start_var = res_var;
+			best_start_path = res_path;
+			best_start_mean = res_mean;
+		}
+	}
+
+	int start_des = best_start_path.back();
+	for (int i = 0; i < rec_partial_paths.size(); ++i)
+	{
+		if (rec_partial_paths[i].first == start_des)
+		{
+			rec_partial_paths[i].first = best_start_path[0];
+			if (i > 0)
+			{
+				swap(rec_partial_paths[i], rec_partial_paths[0]);
+			}
+			break;
+		}
+	}
+	//修改拓扑
+	for (int i = 1; i < best_start_path.size(); ++i)
+	{
+		int node = best_start_path[i], prenode = best_start_path[i - 1];
+		rec_incoming[node] = prenode;
+		rec_outgoing[prenode] = node;
+		rec_is_in_path[prenode] = 11;
+	}
+
+	ship_11_delay += best_start_mean;
+	ship_11_var += best_start_var;
+
+	auto is_in_path = rec_is_in_path;
+	ld res_var = 10, res_mean = 0;
+	vector<int> res_path;
+	for (int i = 1; i < rec_partial_paths.size(); ++i)
+	{
+		//cout << "to find " << origin << "  to  " << p_p.first << endl;
+		auto& p_p = rec_partial_paths[i];
+		connect_nodes(11, p_p.second, 105, childs, means, vars, is_in_path, 5, res_path, res_var, res_mean);
+	}
+
+	int start = res_path[0];
+	for (int i = 1; i < rec_partial_paths.size(); ++i)
+	{
+		if (rec_partial_paths[i].second == start)
+		{
+			rec_partial_paths[i].second = 105;
+			if (i != rec_partial_paths.size() - 1)
+			{
+				swap(rec_partial_paths[i], rec_partial_paths[rec_partial_paths.size() - 1]);
+			}
+			break;
+		}
+	}
+	//修改拓扑
+	for (int i = 1; i < res_path.size(); ++i)
+	{
+		int node = res_path[i], prenode = res_path[i - 1];
+		rec_incoming[node] = prenode;
+		rec_outgoing[prenode] = node;
+		rec_is_in_path[node] = 11;
+	}
+	ship_11_delay += res_mean;
+	ship_11_var += res_var;
+
+	cout << "after delay: " << ship_11_delay << endl;
+	cout << "var: " << ship_11_var << endl;
+
+
+
 
 }

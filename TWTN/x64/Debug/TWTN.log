@@ -1,6 +1,26 @@
-﻿  main.cpp
-E:\TWTN\TWTN\main.cpp(26,38): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-E:\TWTN\TWTN\main.cpp(29,31): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
-E:\TWTN\TWTN\main.cpp(53,43): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
-E:\TWTN\TWTN\main.cpp(74,30): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+﻿  imp.cpp
+E:\TWTN\TWTN\imp.cpp(20,38): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(23,31): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(48,43): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(70,30): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(104,31): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(106,33): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(488,34): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(1152,134): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(1196,140): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(1775,39): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(1775,73): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(1779,43): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(1789,40): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(1796,37): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(1803,37): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(1810,37): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(2415,40): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(2485,16): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(2486,16): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(2534,16): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
+E:\TWTN\TWTN\imp.cpp(2535,16): warning C4244: “初始化”: 从“__int64”转换到“int”，可能丢失数据
+  main.cpp
+  正在生成代码...
+  LINK : 没有找到 E:\TWTN\x64\Debug\TWTN.exe 或上一个增量链接没有生成它；正在执行完全链接
   TWTN.vcxproj -> E:\TWTN\x64\Debug\TWTN.exe

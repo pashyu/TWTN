@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 	vector<ld> var_bound(501, 0), mean_posi_bound(501, 0), mean_nege_bound(501, 0);
 	vector<vector<bool>> dominated(10001, vector<bool>(10001, false));
 	vector<pair<ld, ld>> ini_solution_delays, ini_solution_vars;
-	
+	vector<bool> is_visited(10001, false);
 	read_edge_and_meanvar(means, vars, childs);
 	read_bound("..\\data\\", var_bound, mean_posi_bound, mean_nege_bound);
 	read_origin(origins);
@@ -59,13 +59,16 @@ int main(int argc, char* argv[])
 	//inis_crossover(0, ini_solutions, ini_solution_delays, ini_solution_vars, ini_delays, means, vars);
 	//check_simi(ini_solutions);
 	//cout << (INT_MIN >> 1) << endl;
-	auto start = system_clock::now();
+	/*auto start = system_clock::now();
 	build_path(childs, means, vars, solution, ini_delays, origins, 0.03, shortest_var);
 	auto end = system_clock::now();
 	auto duration = duration_cast<seconds>(end - start);
-	write_solution(solution, "..\\data\\build_path-0.6.txt", duration);
-	/*read_ini_solution(solution, visited, ini_delays, means);
-	cout << "read fin" << endl;
-	check_solution(solution, visited, means, vars, ini_delays);*/
+	write_solution(solution, "..\\data\\build_path-0.6.txt", duration);*/
+	read_ini_solution(solution, is_visited, ini_delays, means);
+	//modify(solution, childs, means, vars, ini_delays, is_visited);
+	check_solution(solution, means, vars, ini_delays);
+	re_build_11_path(solution, childs, means, vars, ini_delays, is_visited, origins);
+	//check_solution(solution, means, vars, ini_delays);
+	//write_solution(solution, "..\\data\\modi_273.69.txt");
 	return 0;
 }
